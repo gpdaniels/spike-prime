@@ -1,4 +1,3 @@
-
 # SPIKE Prime #
 
 This repository is a collection of useful information about the Lego SPIKE Prime hub.
