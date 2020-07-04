@@ -1,0 +1,12 @@
+>>> help('modules')
+__main__          hub               sys               uos
+_onewire          io                time              urandom
+array             json              ubinascii         ure
+binascii          machine           ucollections      uselect
+builtins          math              uctypes           ustruct
+cmath             micropython       uerrno            utime
+collections       os                uhashlib          utimeq
+errno             random            uheapq            uzlib
+gc                re                uio               zlib
+hashlib           select            ujson
+heapq             struct            umachine
