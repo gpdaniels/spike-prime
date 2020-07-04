@@ -19,7 +19,13 @@ This repository is a collection of useful information about the Lego SPIKE Prime
 
 ### Filesystem ###
 
-Dumps of the micropython filesystem on the SPIKE Prime Hub..
+Dumps of the micropython filesystem on the SPIKE Prime Hub using [rshell](https://github.com/dhylands/rshell).
+
+```shell
+rshell
+> connect serial /dev/ttyACM0 115200
+> rsync -a /pyboard ~/spikefw
+```
 
 |                     Dump | Description                                                                             |
 |-------------------------:|:----------------------------------------------------------------------------------------|
