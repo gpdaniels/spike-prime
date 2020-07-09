@@ -33,11 +33,16 @@ rshell
 
 ### Firmware ###
 
-Dumps of the ROM firmware of the SPIKE Prime Hub.
+Dumps of the firmware on the SPIKE Prime Hub using the micropython REPL.
+
+```python
+import firmware
+firmware.flash_read(BYTE_NUMBER)
+```
 
 |                     Dump | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
-|                  **...** | ...                                                                              |
+| **v1.0.03.0034-c3879ab** | Updated firmware (Updated on: 02/07/2020).                                       |
 
 ### Specifications ###
 
