@@ -1,0 +1,25 @@
+>>> import hub
+>>> help(hub)
+object <module 'hub'> is of type module
+  __name__ -- hub
+  __version__ -- v1.0.06.0034-b0c335b
+  info -- <function>
+  power_off -- <function>
+  repl_restart -- <function>
+  Image -- <class 'Image'>
+  status -- <function>
+  port -- <class 'Port'>
+  display -- <Display>
+  button -- <class 'Button'>
+  led -- <function>
+  sound -- Sound()
+  temperature -- <function>
+  motion -- Motion()
+  battery -- Battery class
+  bluetooth -- <bt>
+  ble -- <bluetooth>
+  supervision -- <supervision>
+  USB_VCP -- <class 'USB_VCP'>
+  BT_VCP -- <class 'BT_VCP'>
+  file_transfer -- <function>
+
