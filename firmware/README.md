@@ -10,3 +10,8 @@ firmware.flash_read(BYTE_NUMBER)
 ```
 
 Version numbers are from running the `help(hub)` command on the board.
+
+## Disassembly ##
+
+The hub processor is an STM32F413 which is an ARM Cortex M4 and therefore uses the ARMv7E-M instruction set.
+ARM Cortex M4 is most commonly little endian.
