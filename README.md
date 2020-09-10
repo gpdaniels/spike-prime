@@ -43,6 +43,7 @@ firmware.flash_read(BYTE_NUMBER)
 
 |                     Dump | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
+| **v0.5.01.0000-42a938e** | *MISSING* Initial firmware (Purchased on: 28/05/2020) (Box Version: 29).         |
 | **v1.0.03.0034-c3879ab** | Updated firmware (Updated on: 02/07/2020).                                       |
 | **v1.0.06.0034-b0c335b** | Updated firmware (Updated on: 17/07/2020).                                       |
 
