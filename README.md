@@ -49,6 +49,12 @@ firmware.flash_read(BYTE_NUMBER)
 | **v1.0.06.0034-b0c335b** | Updated firmware (Updated on: 17/07/2020).                                       |
 | **v1.1.01.0000-6b4a939** | Updated firmware (Updated on: 01/09/2020).                                       |
 
+### Simulator ###
+
+A recreation of the spike prime hardware using python to allow testing and debugging python scripts on a PC.
+
+The aim is to create a script to dump the functions of the real hardware and then mock them to allow local development.
+
 ### Specifications ###
 
 The Lego specification pdfs for the electrical parts of the SPIKE Prime kit.
