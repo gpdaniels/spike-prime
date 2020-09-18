@@ -55,6 +55,7 @@ The Lego specification pdfs for the electrical parts of the SPIKE Prime kit.
 
 |                     File | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
+|            **stm32f413** | The microprocessor inside the hub.                                                                    |
 |      **spike-prime-hub** | The main hub.                                                                    |
 |  **spike-prime-battery** | Rechargeable lithium ion battery pack for the hub, capacity 2100 mAH.            |
 | **medium-angular-motor** | Medium motor with integrated absolute orientation sensor, accuracy +- 3 degrees. |
