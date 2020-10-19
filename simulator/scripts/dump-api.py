@@ -1,27 +1,37 @@
 # Get all available modules
 # help("modules")
-module_names = [ "__main__", "micropython", "uhashlib", "uselect", "_onewire", "sys", "uheapq", "ustruct", "builtins", "uarray", "uio", "utime", "cmath", "ubinascii", "ujson", "utimeq", "firmware", "ubluetooth", "umachine", "uzlib", "gc", "ucollections", "uos", "hub", "uctypes", "urandom", "math", "uerrno", "ure" ]
+module_names = [ "micropython", "uhashlib", "uselect", "_onewire", "sys", "uheapq", "ustruct", "builtins", "uarray", "uio", "utime", "cmath", "ubinascii", "ujson", "utimeq", "firmware", "ubluetooth", "umachine", "uzlib", "gc", "ucollections", "uos", "hub", "uctypes", "urandom", "math", "uerrno", "ure" ]
 
-# Recursively add classes and modules to a dict.
-def map_object(everything_map, object_name, object_handle):
-    object_contents = dir(object_handle)
-    object_map = dict();
-    for object_entry_name in object_contents:
-        object_entry_type = type(getattr(object_handle, object_entry_name)).__name__
-        object_map[object_entry_name] = object_entry_type
-        if ((not object_entry_name == "__class__") and (not object_entry_name in everything_map)):
-            if ((object_entry_type == "module") or (isinstance(getattr(object_handle, object_entry_name), type))):
-                #print("Processing {} from {}.".format(object_entry_name, object_name))
-                everything_map = map_object(everything_map, object_entry_name, getattr(object_handle, object_entry_name))
-    everything_map[object_name] = object_map
-    return everything_map
-
-# Map of all objects.
-everything_map = dict()
+# List of objects to be processed.
+object_list_todo = list()
+object_list_done = list()
 
 # Loop over the builtin modules.
-for module_name in module_names:
-    #print("Processing module {}.".format(module_name))
-    everything_map = map_object(everything_map, module_name, __import__(module_name))
+for object_name in module_names:
+    # Add them to the object list to be processed.
+    object_list_todo.append((object_name, __import__(object_name)))
+    object_list_done.append(object_name)
 
-print(everything_map)
+# Loop over all objects.
+while len(object_list_todo) > 0:
+    object_name, object_handle = object_list_todo.pop(0)
+
+    # Reserve space in map, and ensure checks for whether we already have this module pass. 
+    object_map = dict()
+    
+    # Get contents of object.
+    object_entries = dir(object_handle)
+    
+    # Loop over all entries in the object.
+    for object_entry in object_entries:
+        # Add them to the map for output.
+        object_map[object_entry] = (type(getattr(object_handle, object_entry)).__name__, str(getattr(object_handle, object_entry)))
+
+        # Add them to the object list to be processed.
+        if (not object_entry in object_list_done):
+            # Add them to the list for further processing if they are not a base type.
+            if ((not isinstance(getattr(object_handle, object_entry), (str, float, int, list, dict, set))) and (not type(getattr(object_handle, object_entry)).__name__ == "function")):
+                object_list_todo.append((object_entry, getattr(object_handle, object_entry)))
+                object_list_done.append(object_entry)
+            
+    print("{} = {}".format(object_name, object_map))
