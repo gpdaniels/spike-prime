@@ -1,4 +1,4 @@
-# SPIKE Prime #
+# Mindstorms / SPIKE Prime #
 
 |This repository is a collection of useful information about the Lego Mindstorms 51515 and Lego SPIKE Prime hub.|![SPIKE Prime Logo](https://raw.githubusercontent.com/gpdaniels/spike-prime/master/simulator/images/icon.png)|
 |--|--|
@@ -19,7 +19,7 @@
 
 ### Filesystem ###
 
-Dumps of the micropython filesystem on the SPIKE Prime Hub using [rshell](https://github.com/dhylands/rshell).
+Dumps of the micropython filesystem on the Lego hub using [rshell](https://github.com/dhylands/rshell).
 
 ```shell
 rshell
@@ -36,7 +36,7 @@ rshell
 
 ### Firmware ###
 
-Dumps of the firmware on the SPIKE Prime Hub using the micropython REPL.
+Dumps of the firmware on the Lego hub using the micropython REPL.
 
 ```python
 import firmware
@@ -66,7 +66,7 @@ The simulator uses a mocked implementation of the micropython modules available 
 
 ### Specifications ###
 
-The Lego specification pdfs for the electrical parts of the SPIKE Prime kit.
+The Lego specification pdfs for the electrical parts of the Lego hub.
 
 |                     File | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
