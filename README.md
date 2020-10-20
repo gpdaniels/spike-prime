@@ -44,7 +44,7 @@ Version numbers are from running the `help(hub)` command on the board.
 
 |                     Dump | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
-| **v0.5.01.0000-42a938e** | **INCOMPLETE** Initial firmware (Purchased on: 28/05/2020) (Box Version: 29).    |
+| **v0.5.01.0000-42a938e** | Initial firmware (Purchased on: 28/05/2020) (Box Version: 29).                   |
 | **v1.0.03.0034-c3879ab** | Updated firmware using 1.2.1 on Windows(Updated on: 02/07/2020).                 |
 | **v1.0.06.0034-b0c335b** | Updated firmware using 1.3.0 on Windows (Updated on: 17/07/2020).                |
 | **v1.1.01.0000-6b4a939** | Updated firmware using 1.3.1 on Windows (Updated on: 01/09/2020).                |
