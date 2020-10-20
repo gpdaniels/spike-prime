@@ -43,7 +43,8 @@ sed -i '$ s/\xFF*$//' firmware.bin
 mv firmware.bin $(md5sum firmware.bin | awk '{ print $1 }').bin
 ```
 
-Version numbers are from running the `help(hub)` command on the board.
+Long version numbers are from running the `help(hub)` command on the board.
+Short versions numbers are from the `version.py` files where available.
 
 ## Disassembly ##
 

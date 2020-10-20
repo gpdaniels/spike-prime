@@ -8,5 +8,5 @@ rshell
 > rsync -a /pyboard ~/filesystem
 ```
 
-Version numbers are from running the `help(hub)` command on the board.
-
+Long version numbers are from running the `help(hub)` command on the board.
+Short versions numbers are from the `version.py` files where available.

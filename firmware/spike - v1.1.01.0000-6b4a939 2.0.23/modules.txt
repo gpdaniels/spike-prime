@@ -1,0 +1,9 @@
+>>> help('modules')
+__main__          micropython       uhashlib          uselect
+_onewire          sys               uheapq            ustruct
+builtins          uarray            uio               utime
+cmath             ubinascii         ujson             utimeq
+firmware          ubluetooth        umachine          uzlib
+gc                ucollections      uos
+hub               uctypes           urandom
+math              uerrno            ure

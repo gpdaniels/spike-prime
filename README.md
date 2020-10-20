@@ -38,7 +38,8 @@ rshell
 > rsync -a /pyboard ~/filesystem
 ```
 
-Version numbers are from running the `help(hub)` command on the board.
+Long version numbers are from running the `help(hub)` command on the board.
+Short versions numbers are from the `version.py` files where available.
 
 #### SPIKE Prime ####
 
@@ -48,12 +49,14 @@ Version numbers are from running the `help(hub)` command on the board.
 | **v1.0.03.0034-c3879ab** | Updated firmware using 1.2.0 on Windows(Updated on: 02/07/2020).                 |
 | **v1.0.06.0034-b0c335b** | Updated firmware using 1.2.1 on Windows (Updated on: 17/07/2020).                |
 | **v1.1.01.0000-6b4a939** | Updated firmware using 1.3.0 on Windows (Updated on: 01/09/2020).                |
+| **v1.1.01.0000-6b4a939** | Updated firmware using 1.3.1 on Windows (Updated on: 20/10/2020).                |
 
 #### Mindstorms Robot Inventor ####
 
 |                     Dump | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
 | **v0.5.01.0002-f75d82d** | Initial firmware (Purchased on: 16/10/2020).                                     |
+| **v1.0.06.0034-b0c335b** | Updated firmware using 4.0.4-dev.99999 on Windows (Updated on: 20/10/2020).      |
 
 ### Firmware ###
 
@@ -98,7 +101,8 @@ sed -i '$ s/\xFF*$//' firmware.bin
 mv firmware.bin $(md5sum firmware.bin | awk '{ print $1 }').bin
 ```
 
-Version numbers are from running the `help(hub)` command on the board.
+Long version numbers are from running the `help(hub)` command on the board.
+Short versions numbers are from the `version.py` files where available.
 
 #### SPIKE Prime ####
 
@@ -108,12 +112,14 @@ Version numbers are from running the `help(hub)` command on the board.
 | **v1.0.03.0034-c3879ab** | Updated firmware using 1.2.0 on Windows (Updated on: 02/07/2020).                |
 | **v1.0.06.0034-b0c335b** | Updated firmware using 1.2.1 on Windows (Updated on: 17/07/2020).                |
 | **v1.1.01.0000-6b4a939** | Updated firmware using 1.3.0 on Windows (Updated on: 01/09/2020).                |
+| **v1.1.01.0000-6b4a939** | Updated firmware using 1.3.1 on Windows (Updated on: 20/10/2020).                |
 
 #### Mindstorms Robot Inventor ####
 
 |                     Dump | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
 | **v0.5.01.0002-f75d82d** | Initial firmware (Purchased on: 16/10/2020).                                     |
+| **v1.0.06.0034-b0c335b** | Updated firmware using 4.0.4-dev.99999 on Windows (Updated on: 20/10/2020).      |
 
 ### Simulator ###
 

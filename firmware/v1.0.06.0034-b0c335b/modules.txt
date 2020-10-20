@@ -1,9 +1,0 @@
->>> help('modules')
-__main__          math              uerrno            urandom
-_onewire          micropython       uhashlib          ure
-builtins          sys               uheapq            uselect
-cmath             uarray            uio               ustruct
-firmware          ubinascii         ujson             utime
-gc                ucollections      umachine          utimeq
-hub               uctypes           uos               uzlib
-

@@ -1,0 +1,24 @@
+>>> import hub
+>>> help(hub)
+object <module 'hub'> is of type module
+  __name__ -- hub
+  __version__ -- v0.5.01.0002-f75d82d
+  info -- <function>
+  power_off -- <function>
+  Image -- <class 'MicroBitImage'>
+  status -- <function>
+  port -- <class 'Port'>
+  display -- <Display>
+  button -- <class 'button'>
+  led -- <function>
+  sound -- Sound()
+  temperature -- <function>
+  motion -- Motion()
+  battery -- Battery class
+  text -- Text()
+  bluetooth -- <bt>
+  ble -- <bluetooth>
+  firmware -- <firmware>
+  supervision -- <supervision>
+  USB_VCP -- <class 'USB_VCP'>
+  BT_VCP -- <class 'BT_VCP'>
