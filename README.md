@@ -15,6 +15,17 @@
 |        **Motor Drivers** | 6 motor outputs (Driver ICs: 3 x LB1836).                                        |
 |   **Battery Management** | Lithium ion battery management (IC: MPS 2639A).                                  |
 
+## Connecting to the hub ##
+
+To connect to the hub you have two options, a micro USB cable or bluetooth.
+Both options create a serial connection between the hub and the computer.
+At the hub end of this serial connection is a micropython REPL (Read Evaluate Print Loop).
+You can use this REPL to run python commands just like you would in the python interpreter on your computer.
+
+To connect on Linux you will normall use:
+- `/dev/ttyACM0` for USB connections.
+- `/dev/rfcomm0` for bluetooth connections.
+
 ## Directory Content ##
 
 ### Filesystem ###
