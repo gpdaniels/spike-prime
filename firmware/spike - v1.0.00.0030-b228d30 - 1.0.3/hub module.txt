@@ -1,0 +1,4 @@
+>>> import hub
+>>> help(hub)
+object <module 'hub'> is of type module
+  #TODO
