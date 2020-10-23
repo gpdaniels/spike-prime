@@ -66,7 +66,8 @@ class simulator_gui(metaclass=singleton):
         self.window.title("Lego Hub simulator")
         self.window.geometry("1280x720+50+50")
         self.window.resizable(False, False)
-        self.iconphoto_image = tkinter.PhotoImage(file = "./images/icon.png")
+        self.iconphoto_image = tkinter.PhotoImage(file = "./images/icon-spike.png")
+        #self.iconphoto_image = tkinter.PhotoImage(file = "./images/icon-mindstorms.png")
         self.window.iconphoto(False, self.iconphoto_image)
         
         print("Enabling hidden file browsing...")
