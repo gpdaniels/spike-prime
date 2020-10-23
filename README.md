@@ -5,7 +5,7 @@
 
 ## Lego Hub Hardware ##
 
-|                     Part | Description                                                                      |
+|                     Part | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
 |                  **CPU** | STM32F413 (Architecture: ARM Cortex M4, ROM: 1M, RAM: 320k, Clock: 100MHz).      |
 |     **Internal storage** | 32MB flash memory (IC: Winbond W25Q256JV).                                       |
@@ -43,7 +43,7 @@ Short versions numbers are from the `version.py` files where available.
 
 #### SPIKE Prime ####
 
-|                     Dump | Description                                                                      |
+|                     Dump | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
 | **v0.5.01.0000-42a938e** | Initial firmware (Purchased on: 28/05/2020) (Box Version: 29).                   |
 | **v1.0.00.0027-64837e9** | Additional firmware in 1.0.0 on Windows (Extracted from app.asar).               |
@@ -56,7 +56,7 @@ Short versions numbers are from the `version.py` files where available.
 
 #### Mindstorms Robot Inventor ####
 
-|                     Dump | Description                                                                      |
+|                     Dump | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
 | **v0.5.01.0002-f75d82d** | Initial firmware (Purchased on: 16/10/2020).                                     |
 | **v1.0.06.0034-b0c335b** | Updated firmware using 4.0.4-dev.99999 on Windows (Updated on: 20/10/2020).      |
@@ -109,7 +109,7 @@ Short versions numbers are from the `version.py` files where available.
 
 #### SPIKE Prime ####
 
-|                     Dump | Description                                                                      |
+|                     Dump | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
 | **v0.5.01.0000-42a938e** | **MISSING** Initial firmware (Purchased on: 28/05/2020) (Box Version: 29).       |
 | **v1.0.00.0027-64837e9** | **MISSING** Additional firmware in 1.0.0 on Windows (Extracted from app.asar).   |
@@ -122,7 +122,7 @@ Short versions numbers are from the `version.py` files where available.
 
 #### Mindstorms Robot Inventor ####
 
-|                     Dump | Description                                                                      |
+|                     Dump | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
 | **v0.5.01.0002-f75d82d** | Initial firmware (Purchased on: 16/10/2020).                                     |
 | **v1.0.06.0034-b0c335b** | Updated firmware using 4.0.4-dev.99999 on Windows (Updated on: 20/10/2020).      |
@@ -136,7 +136,7 @@ The aim is to create a script to dump the functions of the real hardware and the
 Currently there is two main scripts one to simulate running micropython scripts on a hub and one to push micropython scripts to a real connected hub.
 The simulator uses a mocked implementation of the micropython modules available on the phyical hub that redirect actions to the simulator gui.
 
-|                     File | Description                                                                      |
+|                     File | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
 |         **simulator.py** | A python3 gui based simulator for the Lego hub.                                  |
 |               **run.py** | A python3 script to run a micropython script on a connected Lego hub.            |
@@ -145,7 +145,7 @@ The simulator uses a mocked implementation of the micropython modules available 
 
 The Lego specification pdfs for the electrical parts of the Lego hub.
 
-|                     File | Description                                                                      |
+|                     File | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
 |            **stm32f413** | The microprocessor inside the hub.                                               |
 |      **spike-prime-hub** | The main hub.                                                                    |
