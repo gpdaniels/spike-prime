@@ -45,21 +45,21 @@ Short versions numbers are from the `version.py` files where available.
 
 |                     Dump | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
-| **v0.5.01.0000-42a938e** | Initial firmware (Purchased on: 28/05/2020) (Box Version: 29).                   |
-| **v1.0.00.0027-64837e9** | Additional firmware in 1.0.0 on Windows (Extracted from app.asar).               |
-| **v1.0.00.0030-b228d30** | Firmware from 1.0.0 on Windows (Extracted from app.asar).                        |
-| **v1.0.00.0033-268c151** | Firmware from 1.1.4 on Windows (Extracted from app.asar).                        |
-| **v1.0.03.0034-c3879ab** | Updated firmware using 1.2.0 on Windows(Updated on: 02/07/2020).                 |
-| **v1.0.06.0034-b0c335b** | Updated firmware using 1.2.1 on Windows (Updated on: 17/07/2020).                |
-| **v1.1.01.0000-6b4a939** | Updated firmware using 1.3.0 on Windows (Updated on: 01/09/2020).                |
-| **v1.1.01.0000-6b4a939** | Updated firmware using 1.3.1 on Windows (Updated on: 20/10/2020).                |
+| **v0.5.01.0000-42a938e** | Initial filesystem (Purchased on: 28/05/2020) (Box Version: 29).                 |
+| **v1.0.00.0027-64837e9** | Additional filesystem in 1.0.0 on Windows (Extracted from app.asar).             |
+| **v1.0.00.0030-b228d30** | Filesystem from 1.0.0 on Windows (Extracted from app.asar).                      |
+| **v1.0.00.0033-268c151** | Filesystem from 1.1.4 on Windows (Extracted from app.asar).                      |
+| **v1.0.03.0034-c3879ab** | Updated filesystem using 1.2.0 on Windows(Updated on: 02/07/2020).               |
+| **v1.0.06.0034-b0c335b** | Updated filesystem using 1.2.1 on Windows (Updated on: 17/07/2020).              |
+| **v1.1.01.0000-6b4a939** | Updated filesystem using 1.3.0 on Windows (Updated on: 01/09/2020).              |
+| **v1.1.01.0000-6b4a939** | Updated filesystem using 1.3.1 on Windows (Updated on: 20/10/2020).              |
 
 #### Mindstorms Robot Inventor ####
 
 |                     Dump | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
-| **v0.5.01.0002-f75d82d** | Initial firmware (Purchased on: 16/10/2020).                                     |
-| **v1.0.06.0034-b0c335b** | Updated firmware using 4.0.4-dev.99999 on Windows (Updated on: 20/10/2020).      |
+| **v0.5.01.0002-f75d82d** | Initial filesystem (Purchased on: 16/10/2020).                                   |
+| **v1.0.06.0034-b0c335b** | Updated filesystem using 4.0.4-dev.99999 on Windows (Updated on: 20/10/2020).    |
 
 ### Firmware ###
 
