@@ -31,6 +31,7 @@ import os
 import pathlib
 import runpy
 import sys
+import threading
 import time
 import tkinter
 import tkinter.filedialog
@@ -381,6 +382,158 @@ class simulator_gui(metaclass=singleton):
     def set_temperature(self, temperature):
         self.temperature = temperature
 
+    # Function to wrap raw samples with a wav header, returned as a byte array.
+    def samples_to_wav(self, bytes_per_sample, number_of_channels, sample_rate, samples):
+        # RIFF header (Chunk ID).
+        data = b'RIFF'
+        # Size.
+        wave_size = 36 + len(samples) * bytes_per_sample
+        data = data + wave_size.to_bytes(4, 'little')
+        # Format.
+        data = data + b'WAVE'
+        # Format header (Sub-chunk ID).
+        data = data + b'fmt '
+        # Sub-chunk size (16 for PCM).
+        fmt_size = 16
+        data = data + fmt_size.to_bytes(4, 'little')
+        # Compression code (1 for no compression).
+        compression_code = 1
+        data = data + compression_code.to_bytes(2, 'little')
+        # Channel count.
+        data = data + number_of_channels.to_bytes(2, 'little')
+        # Sample rate.
+        data = data + sample_rate.to_bytes(4, 'little')
+        # Byte rate.
+        byte_rate = bytes_per_sample * number_of_channels * sample_rate;
+        data = data + byte_rate.to_bytes(4, 'little')
+        # Block align.
+        block_align = bytes_per_sample * number_of_channels
+        data = data + block_align.to_bytes(2, 'little')
+        # Bits per sample.
+        bits_per_sample = bytes_per_sample * 8
+        data = data + bits_per_sample.to_bytes(2, 'little')
+        # Data header (Sub-chunk ID).
+        data = data + b'data'
+        # Sub-Chunk size.
+        data_size = len(samples) * bytes_per_sample
+        data = data + data_size.to_bytes(4, 'little')
+        for sample in samples:
+            if (isinstance(sample, int)):
+                data = data + sample.to_bytes(bytes_per_sample, 'little', signed = True)
+            elif (isinstance(sample, float)):
+                scaled_sample = float(sample) * float(2**(bytes_per_sample * 8 - 1))
+                data = data + int(scaled_sample).to_bytes(bytes_per_sample, 'little', signed = True)
+            else:
+                raise TypeError("Unexpected sample type, only int and float are supported.")
+        return data
+
+    def play_sound_windows(self, wav_file_as_byte_array):
+        import winsound
+        winsound.PlaySound(wav_file_as_byte_array, winsound.SND_MEMORY)
+
+    def play_sound_darwin(self, wav_file_as_byte_array):
+        from AppKit import NSSound
+        from AppKit import NSObject
+        from AppKit import NSData
+        
+        nssound = NSSound.alloc()
+        data = NSData.alloc().initWithBytes_length_(wav_file_as_byte_array, len(wav_file_as_byte_array))
+        nssound.initWithData_(data)
+        nssound.setDelegate_(self)
+        if (not nssound):
+            raise IOError('Unable to load sound.')
+        nssound.play()
+
+    def play_sound_linux(self, wav_file_as_byte_array):
+        class player():
+            def __init__(self):
+                import gi
+                gi.require_version("Gst", "1.0")
+                
+                from gi.repository import GObject
+                from gi.repository import Gst
+                
+                GObject.threads_init()
+                Gst.init(None)
+                
+                self.buffer = None
+                self.mainloop = GObject.MainLoop()
+
+                # This creates a playbin pipeline and using the appsrc source we can feed it our stream data
+                self.pipeline = Gst.ElementFactory.make("playbin", None)
+                self.pipeline.set_property("uri", "appsrc://")
+
+                # When the playbin creates the appsrc source it will call this callback and allow us to configure it
+                self.pipeline.connect("source-setup", self.on_source_setup)
+
+                # Creates a bus and set callbacks to receive errors
+                self.bus = self.pipeline.get_bus()
+                self.bus.add_signal_watch()
+                self.bus.connect("message::eos", self.on_eos)
+                self.bus.connect("message::error", self.on_error)
+
+            def exit(self, msg):
+                self.stop()
+                exit(msg)
+
+            def stop(self):
+                # Stop playback and exit mainloop
+                from gi.repository import Gst
+                self.pipeline.set_state(Gst.State.NULL)
+                self.mainloop.quit()
+                self.buffer = None
+
+            def play(self, data):
+                from gi.repository import Gst
+                self.buffer = data
+                self.pipeline.set_state(Gst.State.PLAYING)
+                self.mainloop.run()
+
+            def on_source_setup(self, element, source):
+                # When this callback is called the appsrc expects us to feed it more data
+                source.connect("need-data", self.on_source_need_data)
+
+            def on_source_need_data(self, source, length):
+                # Attempt to read data from the stream
+                data = self.buffer
+                
+                # If data is empty it's the end of stream
+                if not data:
+                    source.emit("end-of-stream")
+                    return
+
+                # Convert the Python bytes into a GStreamer Buffer and then push it to the appsrc
+                from gi.repository import Gst
+                buf = Gst.Buffer.new_wrapped(data)
+                source.emit("push-buffer", buf)
+
+            def on_eos(self, bus, msg):
+                # Stop playback on end of stream
+                self.stop()
+
+            def on_error(self, bus, msg):
+                # Print error message and exit on error
+                error = msg.parse_error()[1]
+                self.exit(error)
+        player().play(wav_file_as_byte_array)
+
+    def play_sound(self, path, skip_samples=0):
+        handle = open(path, "rb")
+        data = handle.read()
+        samples = [int.from_bytes([data[i], data[i+1]], byteorder='little', signed=True) for i in range(0, len(data), 2)]
+        assert(skip_samples < len(samples))
+        wav = self.samples_to_wav(2, 1, 16000, samples[skip_samples:])
+        from platform import system
+        system = system()
+        if (system == "Windows"):
+            self.play_sound_windows(wav)
+        elif (system == "Darwin"):
+            self.play_sound_darwin(wav)
+        elif (system == "Linux"):
+            self.play_sound_linux(wav)
+        else:
+            NotImplementedError("Unknown system '{}' is not supported.".format(system))
+        
     def animation_startup(self):
         for percent in range(100, 0, -10):
             self.set_led(255, 255, int(80.0 * (float(percent) / 100.0)))
@@ -420,9 +573,12 @@ class simulator_gui(metaclass=singleton):
             ["99999:99999:99999:99999:99999", 215],
             ["09090:99999:99999:09990:00900", 500]
         ]
+        sound_thread = threading.Thread(target=self.play_sound, args=["./sounds/startup"], kwargs={})
+        sound_thread.start()
         for frame in frames:
             self.set_image(frame[0])
-            time.sleep(frame[1] / 1000)
+            time.sleep((frame[1] / 1000) / 2)
+        sound_thread.join()
 
     # Shutdown animation.
     def animation_shutdown(self):
@@ -435,10 +591,12 @@ class simulator_gui(metaclass=singleton):
             ["00000:00000:00500:00000:00000", 40],
             ["00000:00000:00000:00000:00000", 40]
         ]
+        sound_thread = threading.Thread(target=self.play_sound, args=["./sounds/menu_shutdown", 25000], kwargs={})
+        sound_thread.start()
         for frame in frames:
             self.set_image(frame[0])
             time.sleep(frame[1] / 1000)
-
+        sound_thread.join()
 
 ################################################################################
 
