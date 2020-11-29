@@ -61,6 +61,7 @@ Short versions numbers are from the `version.py` files where available.
 |-------------------------:|:---------------------------------------------------------------------------------|
 | **v0.5.01.0002-f75d82d** | Initial filesystem (Purchased on: 16/10/2020).                                   |
 | **v1.0.06.0034-b0c335b** | Updated filesystem using 4.0.4-dev.99999 on Windows (Updated on: 20/10/2020).    |
+| **v1.0.06.0034-b0c335b** | Updated filesystem using 10.0.3 on Android (Updated on: 29/11/2020).             |
 
 ### Firmware ###
 
@@ -128,6 +129,7 @@ Short versions numbers are from the `version.py` files where available.
 |-------------------------:|:---------------------------------------------------------------------------------|
 | **v0.5.01.0002-f75d82d** | Initial firmware (Purchased on: 16/10/2020).                                     |
 | **v1.0.06.0034-b0c335b** | Updated firmware using 4.0.4-dev.99999 on Windows (Updated on: 20/10/2020).      |
+| **v1.0.06.0034-b0c335b** | Same as previous firmware. (Updated on: 29/11/2020).                             |
 
 ### Simulator ###
 
