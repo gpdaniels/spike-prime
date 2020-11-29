@@ -102,6 +102,12 @@ class simulator_gui(metaclass=singleton):
         self.menu_main.add_command(label="Load Script", command=self.load_script)
         self.window.bind('<Control-o>', lambda event: self.load_script())
         
+        self.menu_main.add_separator()
+        
+        # Add a script loading button, and bind it to the shortcut ctrl-o.
+        self.menu_main.add_command(label="Save screenshot", command=self.save_screenshot)
+        self.window.bind('<Control-s>', lambda event: self.save_screenshot())
+        
         self.window.configure(menu=self.menu_main)
         
         # Setup hub state.
@@ -273,6 +279,22 @@ class simulator_gui(metaclass=singleton):
             self.reset_state()
             builtins.__import__ = importlib.__import__
             print("Finished file '" + script_path + "'.")
+
+    def save_screenshot(self, screenshot_path = "screenshot.png"):
+        print("Saving screenshot...")
+        try:
+            import mss
+            import mss.tools
+            with mss.mss() as sct:
+                # The screen part to capture
+                monitor = {"top": self.window.winfo_y(), "left": self.window.winfo_x(), "width": self.window.winfo_width(), "height": self.window.winfo_height()}
+                # Grab the data.
+                sct_img = sct.grab(monitor)
+                # Save to the picture file.
+                mss.tools.to_png(sct_img.rgb, sct_img.size, output=screenshot_path)
+                print("Screenshot saved to '{}'.".format(screenshot_path))
+        except:
+            print("Failed to capture screenshot, ensure you have the mss package installed.")
 
     def reset_state(self):
         self.loaded_modules = dict()
