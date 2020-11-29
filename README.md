@@ -93,16 +93,16 @@ sudo dfu-util --list
 sudo dfu-util --alt 0 --dfuse-address 0x08000000:1048576 --upload ~/firmware.bin
 
 # Take ownership of the file created by the dfu-util program.
-sudo chown $(whoami) firmware.bin
+sudo chown $(whoami) ~/firmware.bin
 
 # Remove the first 0x8000 bytes, as these are before the firmware starts.
-fallocate -c -o 0 -l 32768 firmware.bin
+fallocate -c -o 0 -l 32768 ~/firmware.bin
 
 # Remove the trailing bytes that have the value 0xFF, as these are unnecessary.
-sed -i '$ s/\xFF*$//' firmware.bin
+sed -i '$ s/\xFF*$//' ~/firmware.bin
 
 # Rename the firmware to the md5 hash of itself.
-mv firmware.bin $(md5sum firmware.bin | awk '{ print $1 }').bin
+mv ~/firmware.bin ~/$(md5sum ~/firmware.bin | awk '{ print $1 }').bin
 ```
 
 Long version numbers are from running the `help(hub)` command on the board.
