@@ -19,7 +19,6 @@ cmake \
     -DANDROID_STL=c++_static \
     -DJAVA_HOME=${JAVA_HOME} \
     ..
-    
 cmake --build . --target apk
 ```
 
@@ -31,4 +30,18 @@ cmake --build . --target apk-deploy
 
 ## Desktop ##
 
-TODO...
+So far just a skeleton of a console program. To build it on linux you will need the bluetooth library.
+
+```shell
+sudo apt-get install libbluetooth-dev
+```
+
+```shell
+cd controller-desktop
+mkdir BUILD
+cd BUILD
+cmake \
+    -DCMAKE_BUILD_TYPE=Debug \
+    ..
+cmake --build .
+```

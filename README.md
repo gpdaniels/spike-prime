@@ -26,7 +26,30 @@ To connect on Linux you will normall use:
 - `/dev/ttyACM0` for USB connections.
 - `/dev/rfcomm0` for bluetooth connections.
 
+Note: If you press and hold the left button then press the center button to power up the hub, it will startup bypassing the runtime on the hub.
+
+I have found bluetooth on linux to be not that reliable and often have to follow this process:
+
+```shell
+bluetoothctl
+> remove [ADDRESS]
+> scan on
+> connect [ADDRESS]
+> pair [ADDRESS]
+> trust [ADDRESS]
+```
+
+Then I can use rfcomm to create the bluetooth serial port `/dev/rfcomm0`:
+
+```shell
+sudo rfcomm connect hci0 [ADDRESS]
+```
+
 ## Directory Content ##
+
+### Controller ###
+
+An attempt to create an application that can communicate with a hub to allow for remote control / sending of scripts / sensor logging without needing any of the LEGO apps.
 
 ### Filesystem ###
 
@@ -67,6 +90,8 @@ Short versions numbers are from the `version.py` files where available.
 ### Firmware ###
 
 Dumps of the firmware on the Lego hub using the micropython REPL.
+
+The lines below will output a number of bytes of the firmware starting at the provided location, or false if past the end.
 
 ```python
 import firmware
