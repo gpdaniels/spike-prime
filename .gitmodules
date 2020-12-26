@@ -1,0 +1,3 @@
+[submodule "decompiler/micropython"]
+	path = decompiler/micropython
+	url = git@github.com:micropython/micropython.git
