@@ -420,7 +420,7 @@ let branches = [
 let outg = [];
 function out(s: string) {outg.push(s);}
 function disassemblefrom_c_opinput(opinput0: string[], p: { [key: string]: string }) {
-  out(p[opinput0[1].split('& 0xff')[0].trim()] + ':');
+  out(p[opinput0[1].split('& 0xff')[0].trim()] + ': ;' + p[opinput0[2].split('& 0xff')[0].trim()]);
   let opinput = opinput0.map((e) =>
     e.trim().split(",").map((e) => e.trim()).filter((e) => e).map((e, i) =>
       e.startsWith("0x")
@@ -497,13 +497,16 @@ function arrornot(s: string | string[]): string[] {
 
 
 for (let type of execSync('find in -type f').toString().trim().split('\n').map(e => ({ in: e, out: 'out/' + e.slice(3).split('.')[0] + '.s' }))) {
+  if (!type.in.endsWith('.mpy')) continue;
   let outdotc = execSync('python micropython/tools/mpy-tool.py --freeze ' + type.in).toString();
+  console.log(type);
   let keys = (outdotc.split('enum {')[1].split('}')[0].trim().split('\n').map(e => e.trim().split(',')[0]));
   let values = outdotc.split('mp_qstr_frozen_const_pool')[1].split('{')[2].split('}')[0].trim().split('\n').map(e => e.split('"')[3]);
   let entries = keys.map((e, i) => [e, values[i]]);
   let djson = Object.fromEntries(entries);
   let osn = outdotc.split('\n');
   let data = osn.map((e, i) => [e, i] as const).filter(e => e[0].startsWith('STATIC const byte fun_data_'));
+  outg = [];
   data.map(e => osn.slice(e[1] + 1).join('\n').split('};')[0].split('\n').map(e => e.trim())).forEach(t => {
     disassemblefrom_c_opinput(t, djson);
   })
