@@ -59,11 +59,11 @@ if (__name__ == "__main__"):
     
     print("Parsing arguments...")
     parser = argparse.ArgumentParser(description="Runs a micropython script on a physical hub.")
-    parser.add_argument("script_path", help="Script file name to run")
-    parser.add_argument("output_path", nargs='?', help="Output file to used for responses from the hub.\n", default="")
-    parser.add_argument("-p", "--port", help="Hub device path/port.\n  Linux wired is: /dev/ttyACM0\n Linux bluetooth is: /dev/rfcomm0\n", default="/dev/ttyACM0")
-    parser.add_argument("-r", "--reboot", help="Reboot the hub before connecting\n", action='store_true')
-    parser.add_argument("-t", "--timeout", help="Set the connection timeout value in seconds\n", default=10.0)
+    parser.add_argument("script_path", help="Script file name to run.")
+    parser.add_argument("output_path", nargs='?', help="Output file to used for responses from the hub.", default="")
+    parser.add_argument("-p", "--port", help="Hub device path/port. Linux wired is: '/dev/ttyACM0' Linux bluetooth is: '/dev/rfcomm0'.", default="/dev/ttyACM0")
+    parser.add_argument("-r", "--reboot", help="Reboot the hub before connecting.", action='store_true')
+    parser.add_argument("-t", "--timeout", help="Set the connection timeout value in seconds.", default=10.0)
     arguments = parser.parse_args()
     arguments.timeout = float(arguments.timeout)
 
