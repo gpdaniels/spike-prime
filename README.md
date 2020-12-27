@@ -51,6 +51,10 @@ sudo rfcomm connect hci0 [ADDRESS]
 
 An attempt to create an application that can communicate with a hub to allow for remote control / sending of scripts / sensor logging without needing any of the LEGO apps.
 
+### Decompiler ###
+
+This is a disassembler/decompiler that uses the mpy-tool from the micropython repository to disassemble mpy files from the hub filesystem.
+
 ### Filesystem ###
 
 Dumps of the micropython filesystem on the Lego hub using [rshell](https://github.com/dhylands/rshell).
