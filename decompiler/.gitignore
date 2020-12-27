@@ -1,0 +1,8 @@
+# Python byproducts
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Node byproducts
+node_modules/
+jspm_packages/
