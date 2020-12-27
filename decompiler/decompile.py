@@ -608,7 +608,7 @@ if (__name__ == "__main__"):
 
     if (arguments.output_path != ""):
         print("Writing output...")
-        output_file = open(arguments.output_path, 'wb') 
+        output_file = open(arguments.output_path, 'w') 
         output_file.write('\n'.join(globals()['outg']))
     else:
         print("Decompiled output...")
