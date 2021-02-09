@@ -503,7 +503,7 @@ def disassemblefrom_c_opinput(opinput0, p):
             if (a[0] in branches):
                 address = (a[1] | (int(a[2]) << 8)) - 0x8000 + globals()['off']
                 globals()['usedAdderesses'].add(address)
-                return flat([e, '.L' + str(address), [], e][i]);
+                return flat([e, '.L' + str(address), [], e, e][i]);
             else:
                 return [e]
         
@@ -537,6 +537,41 @@ def disassemblefrom_c_opinput(opinput0, p):
         
     globals()['outg'].append('\n'.join(opinput1));
 
+def get_enums(dotc_content):
+    enum_keys = []
+    num_lines = len(dotc_content)
+    found_pos = -1
+    for i in range(num_lines):
+        line = dotc_content[i]
+        if line == 'enum {':
+            found_pos = i
+            break
+    if found_pos == -1:
+        return enum_keys
+    for i in range(found_pos+1, num_lines):
+        line = dotc_content[i]
+        if line == '};':
+            break
+        enum_keys.append(line.split(',')[0].split('=')[0].strip())
+    return enum_keys
+
+def get_values(dotc_content):
+    enum_values = []
+    num_lines = len(dotc_content)
+    found_pos = -1
+    for i in range(num_lines):
+        line = dotc_content[i]
+        if 'mp_qstr_frozen_const_pool' in line:
+            found_pos = i
+            break
+    if found_pos == -1:
+        return enum_values
+    for i in range(found_pos+6, num_lines):
+        line = dotc_content[i]
+        if line.strip() == '},':
+            break
+        enum_values.append(line.split('"')[3].strip())
+    return enum_values
 
 ################################################################################
 
@@ -584,23 +619,21 @@ if (__name__ == "__main__"):
         sys.exit(1)
     
     print("Processing output of mpy-tool...")
+
+    keys = get_enums(captured_output)
     
-    outdotc = '\n'.join(captured_output)
-    
-    keys = [key.strip().split(',')[0] for key in outdotc.split('enum {')[1].split('}')[0].strip().split('\n')]
-    
-    values = [value.split('"')[3] for value in outdotc.split('mp_qstr_frozen_const_pool')[1].split('{')[2].split('}')[0].strip().split('\n')]
+    values = get_values(captured_output)
     
     # Double check we have extracted the map correctly.
     assert(len(keys) == len(values))
     
     entries = dict((key, value) for key, value in zip(keys, values))
     
-    data = [[line, index] for line, index in zip(outdotc.split('\n'), range(len(outdotc.split('\n')))) if line.startswith('STATIC const byte fun_data_')]
+    data = [[line, index] for line, index in zip(captured_output, range(len(captured_output))) if line.startswith('STATIC const byte fun_data_')]
     
     globals()['outg'] = []
     
-    functions_raw = [('\n'.join(outdotc.split('\n')[line_index[1] + 1:])).split('};')[0].split('\n') for line_index in data]
+    functions_raw = [('\n'.join(captured_output[line_index[1] + 1:])).split('};')[0].split('\n') for line_index in data]
     functions = [[function_line.strip() for function_line in function] for function in functions_raw]
     
     for function in functions:
