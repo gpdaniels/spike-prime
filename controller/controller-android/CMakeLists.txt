@@ -118,10 +118,7 @@ SET(ANDROID_R_JAVA          "${CMAKE_BINARY_DIR}/src/com/${COMPANY_NAME}/${PROJE
 SET(ANDROID_R_CLASS         "${CMAKE_BINARY_DIR}/obj/com/${COMPANY_NAME}/${PROJECT_NAME}/R.class")
 SET(ANDROID_CLASSES_DEX     "${CMAKE_BINARY_DIR}/bin/classes.dex")
 
-SET(PROJECT_LIB_ARM_V7      "lib/armeabi-v7a/lib${PROJECT_NAME}.so")
-SET(PROJECT_LIB_ARM_V8      "lib/arm64-v8a/lib${PROJECT_NAME}.so")
-SET(PROJECT_LIB_X86         "lib/x86/lib${PROJECT_NAME}.so")
-SET(PROJECT_LIB_X86_64      "lib/x86_64/lib${PROJECT_NAME}.so")
+SET(ANDROID_PLATFORMS        armeabi-v7a arm64-v8a x86 x86_64)
 
 SET(ANDROID_KEYSTORE_DEBUG  "${CMAKE_BINARY_DIR}/keystore/debug.keystore")
 
@@ -132,74 +129,77 @@ SET(ANDROID_APK             "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.apk")
 SET(ANDROID_STL             "c++_static")
 
 ################################################################################
-# The actual build script. 
+# The build script. 
 ################################################################################
+# NOTE: This is designed to produce no targets during the configure stage.
+# NOTE: Rather when the "apk" target is built it will configure this project for each platform.
+# NOTE: The "apk" target is then tied to ALL so that it runs for the default build.
+IF(DEFINED CMAKE_TOOLCHAIN_FILE AND DEFINED ANDROID_ABI AND DEFINED ANDROID_STL)
+    # Add the native app glue code from the NDK.
+    ADD_LIBRARY(native_app_glue STATIC 
+        "${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.h"
+        "${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c"
+    )
+    TARGET_INCLUDE_DIRECTORIES(native_app_glue PUBLIC "${ANDROID_NDK}/sources/android/native_app_glue")
 
-# Add the native app glue code from the NDK.
-ADD_LIBRARY(native_app_glue STATIC "${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c")
-TARGET_INCLUDE_DIRECTORIES(native_app_glue PUBLIC "${ANDROID_NDK}/sources/android/native_app_glue")
+    # Define a global symbol for the shared linker which is defined in the glue library.
+    SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
 
-# Find the log library.
-FIND_LIBRARY(log-lib log)
+    # Add the project code.
+    FILE(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/source/*.hpp" "${CMAKE_SOURCE_DIR}/source/*.cpp")
+    ADD_LIBRARY(controller SHARED ${SOURCE_FILES})
 
-# Define a global symbol for the shared linker which is defined in the glue library.
-SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
+    # Link the project to all the libraries.
+    TARGET_LINK_LIBRARIES(controller native_app_glue)
+    TARGET_LINK_LIBRARIES(controller android)
+    TARGET_LINK_LIBRARIES(controller log)
+    
+ELSE()
+    # The custom targets for making an apk and deploying to a phone/emulator.
 
-# Add the project code.
-FILE(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/source/*.hpp" "${CMAKE_SOURCE_DIR}/source/*.cpp")
-ADD_LIBRARY(controller SHARED ${SOURCE_FILES})
+    # Create the building targets.
+    ADD_CUSTOM_TARGET(apk ALL
+        DEPENDS "${ANDROID_APK}"
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+        COMMENT "Building apk..."
+    )
 
-# Link the project to all the libraries.
-TARGET_LINK_LIBRARIES(controller android)
-TARGET_LINK_LIBRARIES(controller native_app_glue)
-TARGET_LINK_LIBRARIES(controller ${log-lib})
+    ADD_CUSTOM_TARGET(apk-install
+        COMMAND "${ANDROID_ADB}" install -r "${ANDROID_APK}"
+        DEPENDS "${ANDROID_APK}"
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+        COMMENT "Installing apk..."
+    )
 
-################################################################################
-# The custom targets for making an apk and deploying to a phone/emulator.
-################################################################################
+    ADD_CUSTOM_TARGET(apk-uninstall
+        COMMAND "${ANDROID_ADB}" uninstall "${PACKAGE_NAME}"
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+        COMMENT "Uninstalling apk..."
+    )
 
-# Create the building targets.
-ADD_CUSTOM_TARGET(apk
-    DEPENDS "${ANDROID_APK}"
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-    COMMENT "Building apk..."
-)
+    ADD_CUSTOM_TARGET(apk-deploy
+        COMMAND "${ANDROID_ADB}" install -r -d "${ANDROID_APK}"
+        COMMAND "${ANDROID_ADB}" logcat -c
+        COMMAND "${ANDROID_ADB}" shell monkey -p "${PACKAGE_NAME}" -c android.intent.category.LAUNCHER 1
+        COMMAND "${ANDROID_ADB}" logcat -v brief -m 1 -e "Killing .*:${PACKAGE_NAME}/.*: remove task" --print ActivityManager:I "${PROJECT_NAME}:D" *:S
+        DEPENDS "${ANDROID_APK}"
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+        COMMENT "Deploying apk..."
+    )
 
-ADD_CUSTOM_TARGET(apk-install
-    COMMAND "${ANDROID_ADB}" install -r "${ANDROID_APK}"
-    DEPENDS "${ANDROID_APK}"
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-    COMMENT "Installing apk..."
-)
+    ADD_CUSTOM_TARGET(apk-force-stop
+        COMMAND "${ANDROID_ADB}" shell am force-stop "${PACKAGE_NAME}"
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+        COMMENT "Uninstalling apk..."
+    )
 
-ADD_CUSTOM_TARGET(apk-uninstall
-    COMMAND "${ANDROID_ADB}" uninstall "${PACKAGE_NAME}"
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-    COMMENT "Uninstalling apk..."
-)
-
-ADD_CUSTOM_TARGET(apk-deploy
-    COMMAND "${ANDROID_ADB}" install -r -d "${ANDROID_APK}"
-    COMMAND "${ANDROID_ADB}" logcat -c
-    COMMAND "${ANDROID_ADB}" shell monkey -p "${PACKAGE_NAME}" -c android.intent.category.LAUNCHER 1
-    COMMAND "${ANDROID_ADB}" logcat -v brief -m 1 -e "Killing .*:${PACKAGE_NAME}/.*: remove task" --print ActivityManager:I "${PROJECT_NAME}:D" *:S
-    DEPENDS "${ANDROID_APK}"
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-    COMMENT "Deploying apk..."
-)
-
-ADD_CUSTOM_TARGET(apk-force-stop
-    COMMAND "${ANDROID_ADB}" shell am force-stop "${PACKAGE_NAME}"
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-    COMMENT "Uninstalling apk..."
-)
-
-ADD_CUSTOM_TARGET(apk-record
-    COMMAND "${ANDROID_ADB}" shell screenrecord --time-limit 5 "/sdcard/screen.mp4"
-    COMMAND "${ANDROID_ADB}" pull "/sdcard/screen.mp4" "${CMAKE_BINARY_DIR}/screen.mp4"
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-    COMMENT "Recording screen for 5 seconds..."
-)
+    ADD_CUSTOM_TARGET(apk-record
+        COMMAND "${ANDROID_ADB}" shell screenrecord --time-limit 5 "/sdcard/screen.mp4"
+        COMMAND "${ANDROID_ADB}" pull "/sdcard/screen.mp4" "${CMAKE_BINARY_DIR}/screen.mp4"
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+        COMMENT "Recording screen for 5 seconds..."
+    )
+ENDIF()
 
 ################################################################################
 # The building scripts of each apk part.
@@ -221,14 +221,18 @@ ADD_CUSTOM_COMMAND(
     COMMENT "Running jarsigner..."
 )
 
+SET(PLATFORM_PATHS "")
+SET(PLATFORM_COMMANDS "")
+FOREACH(PLATFORM ${ANDROID_PLATFORMS})
+    LIST(APPEND PLATFORM_PATHS        "lib/${PLATFORM}/lib${PROJECT_NAME}.so" )
+    LIST(APPEND PLATFORM_COMMANDS   COMMAND "${ANDROID_AAPT}" add "${ANDROID_APK_UNSIGNED}" "lib/${PLATFORM}/lib${PROJECT_NAME}.so")
+ENDFOREACH()
+
 ADD_CUSTOM_COMMAND(
     OUTPUT  "${ANDROID_APK_UNSIGNED}"
     COMMAND "${ANDROID_AAPT}" package -f -M "${CMAKE_SOURCE_DIR}/AndroidManifest.xml" -S "${CMAKE_SOURCE_DIR}/resources" -I "${ANDROID_JAR}" -F "${ANDROID_APK_UNSIGNED}"
-    COMMAND "${ANDROID_AAPT}" add "${ANDROID_APK_UNSIGNED}" "${PROJECT_LIB_ARM_V7}"
-    COMMAND "${ANDROID_AAPT}" add "${ANDROID_APK_UNSIGNED}" "${PROJECT_LIB_ARM_V8}"
-    COMMAND "${ANDROID_AAPT}" add "${ANDROID_APK_UNSIGNED}" "${PROJECT_LIB_X86}"
-    COMMAND "${ANDROID_AAPT}" add "${ANDROID_APK_UNSIGNED}" "${PROJECT_LIB_X86_64}"
-    DEPENDS "${CMAKE_SOURCE_DIR}/AndroidManifest.xml" "${PROJECT_LIB_ARM_V7}" "${PROJECT_LIB_ARM_V8}" "${PROJECT_LIB_X86}" "${PROJECT_LIB_X86_64}"
+    ${PLATFORM_COMMANDS}
+    DEPENDS "${CMAKE_SOURCE_DIR}/AndroidManifest.xml" ${PLATFORM_PATHS}
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
     COMMENT "Running aapt..."
 )
@@ -241,78 +245,23 @@ ADD_CUSTOM_COMMAND(
     COMMENT "Creating debug keystore..."
 )
 
-ADD_CUSTOM_COMMAND(
-    OUTPUT  "${PROJECT_LIB_ARM_V7}"
-    COMMAND "${CMAKE_COMMAND}"
-        -H"${CMAKE_SOURCE_DIR}"
-        -B"${CMAKE_BINARY_DIR}/lib/armeabi-v7a/"
-        -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK}/build/cmake/android.toolchain.cmake
-        -DANDROID_SDK=${ANDROID_SDK}
-        -DANDROID_NDK=${ANDROID_NDK}
-        -DANDROID_PLATFORM=${ANDROID_PLATFORM}
-        -DANDROID_ABI=armeabi-v7a
-        -DANDROID_STL=${ANDROID_STL}
-        -DJAVA_HOME=${JAVA_HOME}
-        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-    COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}/lib/armeabi-v7a/"
-    DEPENDS ${SOURCE_FILES}
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-    COMMENT "Creating c++ shared libraries (armeabi-v7a)..."
-)
-
-ADD_CUSTOM_COMMAND(
-    OUTPUT  "${PROJECT_LIB_ARM_V8}"
-    COMMAND "${CMAKE_COMMAND}"
-        -H"${CMAKE_SOURCE_DIR}"
-        -B"${CMAKE_BINARY_DIR}/lib/arm64-v8a/"
-        -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK}/build/cmake/android.toolchain.cmake
-        -DANDROID_SDK=${ANDROID_SDK}
-        -DANDROID_NDK=${ANDROID_NDK}
-        -DANDROID_PLATFORM=${ANDROID_PLATFORM}
-        -DANDROID_ABI=arm64-v8a
-        -DANDROID_STL=${ANDROID_STL}
-        -DJAVA_HOME=${JAVA_HOME}
-        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-    COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}/lib/arm64-v8a/"
-    DEPENDS ${SOURCE_FILES}
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-    COMMENT "Creating c++ shared libraries (arm64-v8a)..."
-)
-
-ADD_CUSTOM_COMMAND(
-    OUTPUT  "${PROJECT_LIB_X86}"
-    COMMAND "${CMAKE_COMMAND}"
-        -H"${CMAKE_SOURCE_DIR}"
-        -B"${CMAKE_BINARY_DIR}/lib/x86/"
-        -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK}/build/cmake/android.toolchain.cmake
-        -DANDROID_SDK=${ANDROID_SDK}
-        -DANDROID_NDK=${ANDROID_NDK}
-        -DANDROID_PLATFORM=${ANDROID_PLATFORM}
-        -DANDROID_ABI=x86
-        -DANDROID_STL=${ANDROID_STL}
-        -DJAVA_HOME=${JAVA_HOME}
-        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-    COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}/lib/x86/"
-    DEPENDS ${SOURCE_FILES}
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-    COMMENT "Creating c++ shared libraries (x86)..."
-)
-
-ADD_CUSTOM_COMMAND(
-    OUTPUT  "${PROJECT_LIB_X86_64}"
-    COMMAND "${CMAKE_COMMAND}"
-        -H"${CMAKE_SOURCE_DIR}"
-        -B"${CMAKE_BINARY_DIR}/lib/x86_64/"
-        -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK}/build/cmake/android.toolchain.cmake
-        -DANDROID_SDK=${ANDROID_SDK}
-        -DANDROID_NDK=${ANDROID_NDK}
-        -DANDROID_PLATFORM=${ANDROID_PLATFORM}
-        -DANDROID_ABI=x86_64
-        -DANDROID_STL=${ANDROID_STL}
-        -DJAVA_HOME=${JAVA_HOME}
-        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} 
-    COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}/lib/x86_64/"
-    DEPENDS ${SOURCE_FILES}
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-    COMMENT "Creating c++ shared libraries (x86_64)..."
-)
+FOREACH(PLATFORM ${ANDROID_PLATFORMS})
+    ADD_CUSTOM_COMMAND(
+        OUTPUT  "lib/${PLATFORM}/lib${PROJECT_NAME}.so"
+        COMMAND "${CMAKE_COMMAND}"
+            -H"${CMAKE_SOURCE_DIR}"
+            -B"${CMAKE_BINARY_DIR}/lib/${PLATFORM}/"
+            -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK}/build/cmake/android.toolchain.cmake
+            -DANDROID_SDK=${ANDROID_SDK}
+            -DANDROID_NDK=${ANDROID_NDK}
+            -DANDROID_PLATFORM=${ANDROID_PLATFORM}
+            -DANDROID_ABI=${PLATFORM}
+            -DANDROID_STL=${ANDROID_STL}
+            -DJAVA_HOME=${JAVA_HOME}
+            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}/lib/${PLATFORM}/"
+        DEPENDS ${SOURCE_FILES}
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+        COMMENT "Creating c++ shared libraries (${PLATFORM})..."
+    )
+ENDFOREACH()
