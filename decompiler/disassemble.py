@@ -576,12 +576,12 @@ def get_values(dotc_content):
 ################################################################################
 
 if (__name__ == "__main__"):
-    print("Initialising decompiler...")
+    print("Initialising disassembler...")
     
     print("Parsing arguments...")
-    parser = argparse.ArgumentParser(description="Decompiles an '.mpy' micropython script.")
-    parser.add_argument("script_path", help="Script file name to decompile.")
-    parser.add_argument("output_path", nargs='?', help="Output file to used for decompiled output.", default="")
+    parser = argparse.ArgumentParser(description="Disassembles an '.mpy' micropython script.")
+    parser.add_argument("script_path", help="Script file name to disassemble.")
+    parser.add_argument("output_path", nargs='?', help="Output file to used for disassembled output.", default="")
     arguments = parser.parse_args()
 
     print("Checking script...")
@@ -644,7 +644,7 @@ if (__name__ == "__main__"):
         output_file = open(arguments.output_path, 'w') 
         output_file.write('\n'.join(globals()['outg']))
     else:
-        print("Decompiled output...")
+        print("Disassembled output...")
         print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         print('\n'.join(globals()['outg']))
         print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
