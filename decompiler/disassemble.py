@@ -491,6 +491,8 @@ def disassemblefrom_c_opinput(opinput0, p):
                     return 'ldloc.{}'.format(e - 0xb0)
                 elif ((type(e) is int) and (e >= 0xc0) and (e < 0xd0) and (i == 0)):
                     return 'stloc.{}'.format(e - 0xc0)
+                elif ((type(e) is int) and (e >= 0x80) and (e < 0x90) and (i == 0)):
+                    return 'int {}'.format(e - 0x80)
                 else:
                     return e
             else:
