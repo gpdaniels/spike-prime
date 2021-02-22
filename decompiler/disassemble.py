@@ -338,7 +338,7 @@ def disassemblefrom_c_opinput(opinput0, p):
         stage1 = [e for e in stage1 if e]
         
         globals()['off'] += len(stage1)
-        stage1.append(str(off))
+        stage1.append(str(globals()['off']))
         
         def stage2_lbd(e):
             if (e.startswith('0x')):
