@@ -6,6 +6,14 @@ import importlib
 import io 
 import sys
 
+MP_BC_MASK_FORMAT                  = 0xf0
+MP_BC_MASK_EXTRA_BYTE              = 0x9e
+
+MP_BC_FORMAT_BYTE                  = 0
+MP_BC_FORMAT_QSTR                  = 1
+MP_BC_FORMAT_VAR_UINT              = 2
+MP_BC_FORMAT_OFFSET                = 3
+
 #MP_BC_BASE_RESERVED               = 0x00 # ----------------
 
 MP_BC_BASE_QSTR_O                 = 0x10 # LLLLLLSSSDDII---
@@ -15,11 +23,11 @@ MP_BC_BASE_JUMP_E                 = 0x40 # J-JJJJJEEEEF----
 MP_BC_BASE_BYTE_O                 = 0x50 # LLLLSSDTTTTTEEFF
 MP_BC_BASE_BYTE_E                 = 0x60 # --BREEEYYI------
 
-#MP_BC_LOAD_CONST_SMALL_INT_MULTI  = 0x70 # LLLLLLLLLLLLLLLL
-#MP_BC_LOAD_FAST_MULTI             = 0xb0 # LLLLLLLLLLLLLLLL
-#MP_BC_STORE_FAST_MULTI            = 0xc0 # SSSSSSSSSSSSSSSS
-#MP_BC_UNARY_OP_MULTI              = 0xd0 # OOOOOOO
-#MP_BC_BINARY_OP_MULTI             = 0xd7 #        OOOOOOOOO
+MP_BC_LOAD_CONST_SMALL_INT_MULTI  = 0x70 # LLLLLLLLLLLLLLLL
+MP_BC_LOAD_FAST_MULTI             = 0xb0 # LLLLLLLLLLLLLLLL
+MP_BC_STORE_FAST_MULTI            = 0xc0 # SSSSSSSSSSSSSSSS
+MP_BC_UNARY_OP_MULTI              = 0xd0 # OOOOOOO
+MP_BC_BINARY_OP_MULTI             = 0xd7 #        OOOOOOOOO
 
 ################################################################################
 
@@ -288,12 +296,19 @@ opsnm = {
 }
 
 branches = [
+    "jmp",
     "btrue",
     "bfalse",
     "btrue.pop",
     "bfalse.pop",
-    "jmp.unwind",
-    "jmp",
+    "jmp.unwind"
+]
+branches2 = [
+    "with.setup",
+    "except.setup",
+    "finally.setup",
+    "except.jump",
+    "for.iter"
 ]
 
 class capturing(list):
@@ -356,17 +371,19 @@ def disassemblefrom_c_opinput(opinput0, p):
         
         def stage3_lbd(e, i):
             if ((type(e) is int) and (i == 0)):
-                if ((e in optypes) and (optypes[e] in opsnm)): 
+                if ((e in optypes) and (optypes[e] in opsnm)):
                     return opsnm[optypes[e]]
-                elif ((type(e) is int) and (e >= 0xb0) and (e < 0xc0) and (i == 0)):
-                    return 'ldloc.{}'.format(e - 0xb0)
-                elif ((type(e) is int) and (e >= 0xc0) and (e < 0xd0) and (i == 0)):
-                    return 'stloc.{}'.format(e - 0xc0)
+                elif ((type(e) is int) and (e >= MP_BC_LOAD_FAST_MULTI) and (e < MP_BC_STORE_FAST_MULTI) and (i == 0)):
+                    return 'ldloc.{}'.format(e - MP_BC_LOAD_FAST_MULTI)
+                elif ((type(e) is int) and (e >= MP_BC_STORE_FAST_MULTI) and (e < MP_BC_UNARY_OP_MULTI) and (i == 0)):
+                    return 'stloc.{}'.format(e - MP_BC_STORE_FAST_MULTI)
                 elif ((type(e) is int) and (e >= 0x80) and (e < 0x90) and (i == 0)):
                     return 'int {}'.format(e - 0x80)
                 else:
+                    print('Unknown opcode: {}'.format(e))
                     return e
             else:
+                #print('Opcode: {} position {}'.format(e, i))
                 return e
         
         stage3 = stage2
@@ -375,6 +392,10 @@ def disassemblefrom_c_opinput(opinput0, p):
         def stage4_lbd(e, i, a):
             if (a[0] in branches):
                 address = (a[1] | (int(a[2]) << 8)) - 0x8000 + globals()['off']
+                globals()['usedAdderesses'].add(address)
+                return flat([e, '.L' + str(address), [], e, e][i])
+            elif (a[0] in branches2):
+                address = (a[1] | (int(a[2]) << 8)) + globals()['off']
                 globals()['usedAdderesses'].add(address)
                 return flat([e, '.L' + str(address), [], e, e][i])
             else:
