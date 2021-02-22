@@ -330,7 +330,7 @@ def disassemblefrom_c_opinput(opinput0, p):
     globals()['off'] = 0
     globals()['usedAdderesses'] = set()
     
-    def process_opinput0(line):
+    def process_opinput1(line):
         stage0 = line.strip().split(",")
         
         stage1 = stage0
@@ -376,7 +376,7 @@ def disassemblefrom_c_opinput(opinput0, p):
             if (a[0] in branches):
                 address = (a[1] | (int(a[2]) << 8)) - 0x8000 + globals()['off']
                 globals()['usedAdderesses'].add(address)
-                return flat([e, '.L' + str(address), [], e, e][i]);
+                return flat([e, '.L' + str(address), [], e, e][i])
             else:
                 return [e]
         
@@ -385,11 +385,12 @@ def disassemblefrom_c_opinput(opinput0, p):
         
         return flat(stage4)
     
-    opinput = [process_opinput0(e) for e in opinput0]
+    opinput1 = opinput0
+    opinput1 = [process_opinput1(e) for e in opinput1]
     
     globals()['off'] = 0
     
-    def process_opinput1(e, i, a):
+    def process_opinput2(e, i, a):
         def comma_test(e, i):
             if (i > 1):
                 return ', {}'.format(e)
@@ -400,15 +401,15 @@ def disassemblefrom_c_opinput(opinput0, p):
         e3 = ' '.join(e2)
         e4 = e3.replace(' , ', ', ')
         
-        if ((i >= 1) and (int(a[i - 1][len(a[i - 1]) - 1]) in globals()['usedAdderesses'])):
+        if ((i >= 1) and (int(a[i - 1][-1]) in globals()['usedAdderesses'])):
             return '.L' + a[i - 1][len(a[i - 1]) - 1] + ':\n\t' + e4
         else:
             return '\t' + e4
     
-    opinput1 = opinput[4:]
-    opinput1 = [process_opinput1(e, i, opinput1) for e, i in zip(opinput1, range(len(opinput1)))]
+    opinput2 = opinput1[4:]
+    opinput2 = [process_opinput2(e, i, opinput2) for e, i in zip(opinput2, range(len(opinput2)))]
         
-    globals()['outg'].append('\n'.join(opinput1));
+    globals()['outg'].append('\n'.join(opinput2));
 
 def get_enums(dotc_content):
     enum_keys = []
