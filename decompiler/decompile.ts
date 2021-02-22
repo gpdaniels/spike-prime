@@ -38,14 +38,15 @@ function evalopwithstack(shadow: string[], i: number, x: fmt, stack: string[], t
 		let out = e
 			.replaceAll(/\$pop\([0-9]+\)/g, p => data[p.slice(5, -1)])
 			.replaceAll(/\$fun\([^\)]+\)/g, p => {
-				console.log('    '.repeat(tablevel) + 'def ' + p.slice(5, -1) + '(*args):')
-				decompile_text(grps.get(p.slice(5, -1)), tablevel + 1) // '__tfn_' + p
+//				// Quick fix to get decompiling to finish.
+//				console.log('    '.repeat(tablevel) + 'def ' + p.slice(5, -1) + '(*args):')
+//				decompile_text(grps.get(p.slice(5, -1)), tablevel + 1) // '__tfn_' + p
 				return p.slice(5, -1)
 			})
 			.replaceAll(/\$fst\([^,]+,[^\)]+\)/g, p => {
 				let [id, nm] = p.slice(5, -1).split(',')
 				console.log('    '.repeat(tablevel) + 'def ' + nm + '(*args):')
-				decompile_text(grps.get(id), tablevel + 1) // '__tfn_' + p
+				decompile_text(grps.get(nm), tablevel + 1) // '__tfn_' + p
 				return '$nop'
 			})
 			.replaceAll(/\$warp\([0-9]+\)/g, p => {
@@ -179,24 +180,24 @@ function decompile_text(text: string, tlba: number = 0) {
 		}
 	}
 
-	for (let opidx in x) {
-		let op = x[opidx]
-		if (op[0] == 'except.setup') {
-			let current = +op[1]
-			decompilerShadow[opidx] = 'try {'
-			decompilerShadow[current - 2] = `$push(__except)`
-			decompilerShadow[current - 1] = `} except Exception as __except {`
-			let end_ptr = +x[current - 2][1] - 2
-			do {
-				decompilerShadow[current + 5] = `$nop`
-				let offset = +x[current + 5][1]
-				for (let i = 0; i < 5; i++) decompilerShadow[offset + i] = '$nop'
-				decompilerShadow[offset + 5] = '$psh2(__except)'
-				current = +x[current + 3][1]
-			} while (current != end_ptr)
-			decompilerShadow[end_ptr - 3] = '}'
-		}
-	}
+//	for (let opidx in x) {
+//		let op = x[opidx]
+//		if (op[0] == 'except.setup') {
+//			let current = +op[1]
+//			decompilerShadow[opidx] = 'try {'
+//			decompilerShadow[current - 2] = `$push(__except)`
+//			decompilerShadow[current - 1] = `} except Exception as __except {`
+//			let end_ptr = +x[current - 2][1] - 2
+//			do {
+//				decompilerShadow[current + 5] = `$nop`
+//				let offset = +x[current + 5][1]
+//				for (let i = 0; i < 5; i++) decompilerShadow[offset + i] = '$nop'
+//				decompilerShadow[offset + 5] = '$psh2(__except)'
+//				current = +x[current + 3][1]
+//			} while (current != end_ptr)
+//			decompilerShadow[end_ptr - 3] = '}'
+//		}
+//	}
 
 	for (let opidx in x) {
 		let op = x[opidx]
