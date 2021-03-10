@@ -1,0 +1,39 @@
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:4.0.0"
+    }
+}
+
+apply plugin: 'com.android.application'
+
+android {
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            res.srcDirs = ['resources']
+        }
+    }
+    compileSdkVersion 29
+    defaultConfig {
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_SDK=${android.getSdkDirectory().getAbsolutePath()}", "-DJAVA_HOME=${System.properties['java.home']}"
+            }
+        }
+        ndk {
+            abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path file('CMakeLists.txt')
+        }
+    }
+    repositories {
+        google()
+    }
+}
