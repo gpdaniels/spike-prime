@@ -21,7 +21,7 @@ To boot the device into DFU mode:
 5. The `dfu-util` program can be used to extract the firmware, see the script below.
 
 ```shell
-# Install the dfu-util program if you do no already have it.
+# Install the dfu-util program if you do not already have it.
 # sudo apt-get install dfu-util
 
 # List the connected devices, this should show the hub is connected.
