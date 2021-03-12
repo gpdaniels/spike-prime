@@ -147,12 +147,12 @@ IF(DEFINED CMAKE_TOOLCHAIN_FILE AND DEFINED ANDROID_ABI AND DEFINED ANDROID_STL)
 
     # Add the project code.
     FILE(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/source/*.hpp" "${CMAKE_SOURCE_DIR}/source/*.cpp")
-    ADD_LIBRARY(controller SHARED ${SOURCE_FILES})
+    ADD_LIBRARY(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 
     # Link the project to all the libraries.
-    TARGET_LINK_LIBRARIES(controller native_app_glue)
-    TARGET_LINK_LIBRARIES(controller android)
-    TARGET_LINK_LIBRARIES(controller log)
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME} native_app_glue)
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME} android)
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME} log)
     
 ELSE()
     # The custom targets for making an apk and deploying to a phone/emulator.
