@@ -1,6 +1,6 @@
 #
 # The MIT License
-# Copyright (c) 2020 Geoffrey Daniels. http://gpdaniels.com/
+# Copyright (c) 2021 Geoffrey Daniels. http://gpdaniels.com/
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -114,9 +114,9 @@ SET(JAVA_JARSIGNER          "${JAVA_HOME}/bin/jarsigner")
 SET(JAVA_KEYTOOL            "${JAVA_HOME}/bin/keytool")
 SET(JAVA_JAVAC              "${JAVA_HOME}/bin/javac")
 
-SET(ANDROID_R_JAVA          "${CMAKE_BINARY_DIR}/src/com/${COMPANY_NAME}/${PROJECT_NAME}/R.java")
+SET(ANDROID_R_JAVA          "${CMAKE_BINARY_DIR}/gen/com/${COMPANY_NAME}/${PROJECT_NAME}/R.java")
 SET(ANDROID_R_CLASS         "${CMAKE_BINARY_DIR}/obj/com/${COMPANY_NAME}/${PROJECT_NAME}/R.class")
-SET(ANDROID_CLASSES_DEX     "${CMAKE_BINARY_DIR}/bin/classes.dex")
+SET(ANDROID_CLASSES_DEX     "${CMAKE_BINARY_DIR}/classes.dex")
 
 SET(ANDROID_PLATFORMS        armeabi-v7a arm64-v8a x86 x86_64)
 
@@ -147,14 +147,22 @@ IF(DEFINED CMAKE_TOOLCHAIN_FILE AND DEFINED ANDROID_ABI AND DEFINED ANDROID_STL)
 
     # Add the project code.
     FILE(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/source/*.hpp" "${CMAKE_SOURCE_DIR}/source/*.cpp")
-    ADD_LIBRARY(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+    IF(SOURCE_FILES)
+        ADD_LIBRARY(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 
-    # Link the project to all the libraries.
-    TARGET_LINK_LIBRARIES(${PROJECT_NAME} native_app_glue)
-    TARGET_LINK_LIBRARIES(${PROJECT_NAME} android)
-    TARGET_LINK_LIBRARIES(${PROJECT_NAME} log)
-    
+        # Link the project to all the libraries.
+        TARGET_LINK_LIBRARIES(${PROJECT_NAME} native_app_glue)
+        TARGET_LINK_LIBRARIES(${PROJECT_NAME} android)
+        TARGET_LINK_LIBRARIES(${PROJECT_NAME} log)
+    ENDIF()
+
 ELSE()
+    # Still check for c++ files, as this is used to enable/disable the native build.
+    FILE(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/source/*.hpp" "${CMAKE_SOURCE_DIR}/source/*.cpp")
+    
+    # Gather the java files here.
+    FILE(GLOB_RECURSE JAVA_FILES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/source/*.java")
+    
     # The custom targets for making an apk and deploying to a phone/emulator.
 
     # Create the building targets.
@@ -207,7 +215,7 @@ ENDIF()
 
 ADD_CUSTOM_COMMAND(
     OUTPUT  ${ANDROID_APK}
-    COMMAND "${ANDROID_ZIPALIGN}" -f 4 "${ANDROID_APK_UNALIGNED}" "${ANDROID_APK}"
+    COMMAND "${ANDROID_ZIPALIGN}" -f -p 4 "${ANDROID_APK_UNALIGNED}" "${ANDROID_APK}"
     DEPENDS "${ANDROID_APK_UNALIGNED}"
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
     COMMENT "Running zipalign..."
@@ -223,18 +231,41 @@ ADD_CUSTOM_COMMAND(
 
 SET(PLATFORM_PATHS "")
 SET(PLATFORM_COMMANDS "")
-FOREACH(PLATFORM ${ANDROID_PLATFORMS})
-    LIST(APPEND PLATFORM_PATHS        "lib/${PLATFORM}/lib${PROJECT_NAME}.so" )
-    LIST(APPEND PLATFORM_COMMANDS   COMMAND "${ANDROID_AAPT}" add "${ANDROID_APK_UNSIGNED}" "lib/${PLATFORM}/lib${PROJECT_NAME}.so")
-ENDFOREACH()
+IF(SOURCE_FILES)
+    FOREACH(PLATFORM ${ANDROID_PLATFORMS})
+        LIST(APPEND PLATFORM_PATHS "lib/${PLATFORM}/lib${PROJECT_NAME}.so" )
+        LIST(APPEND PLATFORM_COMMANDS COMMAND "${ANDROID_AAPT}" add "${ANDROID_APK_UNSIGNED}" "lib/${PLATFORM}/lib${PROJECT_NAME}.so")
+    ENDFOREACH()
+ENDIF()
+IF(JAVA_FILES)
+    LIST(APPEND PLATFORM_COMMANDS COMMAND "${ANDROID_AAPT}" add "${ANDROID_APK_UNSIGNED}" "classes.dex")
+ENDIF()
 
 ADD_CUSTOM_COMMAND(
     OUTPUT  "${ANDROID_APK_UNSIGNED}"
     COMMAND "${ANDROID_AAPT}" package -f -M "${CMAKE_SOURCE_DIR}/AndroidManifest.xml" -S "${CMAKE_SOURCE_DIR}/resources" -I "${ANDROID_JAR}" -F "${ANDROID_APK_UNSIGNED}"
     ${PLATFORM_COMMANDS}
-    DEPENDS "${CMAKE_SOURCE_DIR}/AndroidManifest.xml" ${PLATFORM_PATHS}
+    DEPENDS "${CMAKE_SOURCE_DIR}/AndroidManifest.xml" ${PLATFORM_PATHS} "${ANDROID_CLASSES_DEX}"
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-    COMMENT "Running aapt..."
+    COMMENT "Running aapt to package initial apk..."
+)
+
+ADD_CUSTOM_COMMAND(
+    OUTPUT  "${ANDROID_CLASSES_DEX}"
+    COMMAND "${JAVA_JAVAC}" -bootclasspath "${JAVA_HOME}/jre/lib/rt.jar" -source 1.7 -target 1.7 -classpath "${ANDROID_JAR}" -d obj "${ANDROID_R_JAVA}" ${JAVA_FILES}
+    COMMAND "${ANDROID_DX}" --dex --output="${ANDROID_CLASSES_DEX}" obj
+    DEPENDS "${ANDROID_R_JAVA}" ${JAVA_FILES}
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+    COMMENT "Creating classes.dex..."
+)
+
+ADD_CUSTOM_COMMAND(
+    OUTPUT  "${ANDROID_R_JAVA}"
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/gen"
+    COMMAND "${ANDROID_AAPT}" package -f -m -J "${CMAKE_BINARY_DIR}/gen" -M "${CMAKE_SOURCE_DIR}/AndroidManifest.xml" -S "${CMAKE_SOURCE_DIR}/resources" -I "${ANDROID_JAR}"
+    DEPENDS "${CMAKE_SOURCE_DIR}/AndroidManifest.xml"
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+    COMMENT "Creating R.java..."
 )
 
 ADD_CUSTOM_COMMAND(
