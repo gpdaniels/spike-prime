@@ -35,7 +35,7 @@ PROJECT(${PROJECT_NAME})
 #  JAVA_HOME - The java path.
 IF(NOT DEFINED ANDROID_SDK)
     IF(DEFINED $ENV{ANDROID_SDK})
-        SET(ANDROID_SDK "$ENV{ANDROID_SDK}" CACHE PATH "The android sdk path.")
+        SET(ANDROID_SDK "$ENV{ANDROID_SDK}")
     ENDIF()
     # Could add other paths to check here.
     #...
@@ -46,7 +46,7 @@ ENDIF()
 
 IF(NOT DEFINED ANDROID_NDK)
     IF(DEFINED $ENV{ANDROID_NDK})
-        SET(ANDROID_NDK "$ENV{ANDROID_NDK}" CACHE PATH "The android ndk path.")
+        SET(ANDROID_NDK "$ENV{ANDROID_NDK}")
     ENDIF()
     # Could add other paths to check here.
     #...
@@ -57,7 +57,7 @@ ENDIF()
 
 IF(NOT DEFINED ANDROID_PLATFORM)
     IF(DEFINED $ENV{ANDROID_PLATFORM})
-        SET(ANDROID_PLATFORM "$ENV{ANDROID_PLATFORM}" CACHE PATH "The desired android platform.")
+        SET(ANDROID_PLATFORM "$ENV{ANDROID_PLATFORM}")
     ENDIF()
     # Could add other paths to check here.
     #...
@@ -68,13 +68,31 @@ ENDIF()
 
 IF(NOT DEFINED JAVA_HOME)
     IF(DEFINED $ENV{JAVA_HOME})
-        SET(JAVA_HOME "$ENV{JAVA_HOME}" CACHE PATH "The java path.")
+        SET(JAVA_HOME "$ENV{JAVA_HOME}")
     ENDIF()
     # Could add other paths to check here.
     #...
     IF(NOT DEFINED JAVA_HOME)
         MESSAGE(FATAL_ERROR "Please provide the java path in the variable JAVA_HOME.")
     ENDIF()
+ENDIF()
+
+# Ensure paths are cached
+GET_PROPERTY(IS_ANDROID_SDK_CACHED CACHE ${ANDROID_SDK} PROPERTY TYPE)
+IF(NOT IS_ANDROID_SDK_CACHED)
+    SET(ANDROID_SDK "${ANDROID_SDK}" CACHE PATH "The android sdk path.")
+ENDIF()
+GET_PROPERTY(IS_ANDROID_NDK_CACHED CACHE ${ANDROID_NDK} PROPERTY TYPE)
+IF(NOT IS_ANDROID_NDK_CACHED)
+    SET(ANDROID_NDK "${ANDROID_NDK}" CACHE PATH "The android ndk path.")
+ENDIF()
+GET_PROPERTY(IS_ANDROID_PLATFORM_CACHED CACHE ${ANDROID_PLATFORM} PROPERTY TYPE)
+IF(NOT IS_ANDROID_PLATFORM_CACHED)
+    SET(ANDROID_PLATFORM "${ANDROID_PLATFORM}" CACHE PATH "The desired android platform.")
+ENDIF()
+GET_PROPERTY(IS_JAVA_HOME_CACHED CACHE ${JAVA_HOME} PROPERTY TYPE)
+IF(NOT IS_JAVA_HOME_CACHED)
+    SET(JAVA_HOME "${JAVA_HOME}" CACHE PATH "The java path.")
 ENDIF()
 
 # Get all installed android build-tools versions.
@@ -109,10 +127,12 @@ SET(ANDROID_JAR             "${ANDROID_SDK}/platforms/${ANDROID_PLATFORM_MAX}/an
 SET(ANDROID_DX              "${ANDROID_SDK}/build-tools/${ANDROID_BUILD_TOOLS_VERSION_MAX}/dx")
 SET(ANDROID_ZIPALIGN        "${ANDROID_SDK}/build-tools/${ANDROID_BUILD_TOOLS_VERSION_MAX}/zipalign")
 SET(ANDROID_ADB             "${ANDROID_SDK}/platform-tools/adb")
+SET(ANDROID_APKSIGNER       "${ANDROID_SDK}/build-tools/${ANDROID_BUILD_TOOLS_VERSION_MAX}/lib/apksigner.jar")
 
 SET(JAVA_JARSIGNER          "${JAVA_HOME}/bin/jarsigner")
 SET(JAVA_KEYTOOL            "${JAVA_HOME}/bin/keytool")
 SET(JAVA_JAVAC              "${JAVA_HOME}/bin/javac")
+SET(JAVA_JAVA               "${JAVA_HOME}/bin/java")
 
 SET(ANDROID_R_JAVA          "${CMAKE_BINARY_DIR}/gen/com/${COMPANY_NAME}/${PROJECT_NAME}/R.java")
 SET(ANDROID_R_CLASS         "${CMAKE_BINARY_DIR}/obj/com/${COMPANY_NAME}/${PROJECT_NAME}/R.class")
@@ -122,9 +142,10 @@ SET(ANDROID_PLATFORMS        armeabi-v7a arm64-v8a x86 x86_64)
 
 SET(ANDROID_KEYSTORE_DEBUG  "${CMAKE_BINARY_DIR}/keystore/debug.keystore")
 
-SET(ANDROID_APK_UNSIGNED    "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.unsigned.apk")
-SET(ANDROID_APK_UNALIGNED   "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.unaligned.apk")
-SET(ANDROID_APK             "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.apk")
+SET(ANDROID_APK_UNALIGNED_UNSIGNED  "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.unaligned.unsigned.apk")
+SET(ANDROID_APK_UNALIGNED           "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.unaligned.apk")
+SET(ANDROID_APK_UNSIGNED            "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.unsigned.apk")
+SET(ANDROID_APK                     "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.apk")
 
 SET(ANDROID_STL             "c++_static")
 
@@ -213,37 +234,55 @@ ENDIF()
 # The building scripts of each apk part.
 ################################################################################
 
-ADD_CUSTOM_COMMAND(
-    OUTPUT  ${ANDROID_APK}
-    COMMAND "${ANDROID_ZIPALIGN}" -f -p 4 "${ANDROID_APK_UNALIGNED}" "${ANDROID_APK}"
-    DEPENDS "${ANDROID_APK_UNALIGNED}"
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-    COMMENT "Running zipalign..."
-)
+IF(TRUE)
+    ADD_CUSTOM_COMMAND(
+        OUTPUT  "${ANDROID_APK}"
+        COMMAND "${ANDROID_ZIPALIGN}" -f -p 4 "${ANDROID_APK_UNALIGNED}" "${ANDROID_APK}"
+        DEPENDS "${ANDROID_APK_UNALIGNED}"
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+        COMMENT "Running zipalign..."
+    )
+    
+    ADD_CUSTOM_COMMAND(
+        OUTPUT  "${ANDROID_APK_UNALIGNED}"
+        COMMAND "${JAVA_JARSIGNER}" -keystore "${ANDROID_KEYSTORE_DEBUG}" -storepass "android" -keypass "android" -signedjar "${ANDROID_APK_UNALIGNED}" "${ANDROID_APK_UNALIGNED_UNSIGNED}" "androiddebugkey"
+        DEPENDS "${ANDROID_APK_UNALIGNED_UNSIGNED}" "${ANDROID_KEYSTORE_DEBUG}"
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+        COMMENT "Running jarsigner..."
+    )
+ELSE()
+    ADD_CUSTOM_COMMAND(
+        OUTPUT  "${ANDROID_APK}"
+        COMMAND "${JAVA_JAVA}" -jar "${ANDROID_APKSIGNER}" sign --ks "${ANDROID_KEYSTORE_DEBUG}" --ks-pass pass:android --ks-key-alias androiddebugkey --key-pass pass:android --in "${ANDROID_APK_UNSIGNED}" --out "${ANDROID_APK}"
+        DEPENDS "${ANDROID_APK_UNSIGNED}" "${ANDROID_KEYSTORE_DEBUG}"
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+        COMMENT "Running apksigner..."
+    )
 
-ADD_CUSTOM_COMMAND(
-    OUTPUT  "${ANDROID_APK_UNALIGNED}"
-    COMMAND "${JAVA_JARSIGNER}" -keystore "${ANDROID_KEYSTORE_DEBUG}" -storepass "android" -keypass "android" -signedjar "${ANDROID_APK_UNALIGNED}" "${ANDROID_APK_UNSIGNED}" "androiddebugkey"
-    DEPENDS "${ANDROID_APK_UNSIGNED}" "${ANDROID_KEYSTORE_DEBUG}"
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-    COMMENT "Running jarsigner..."
-)
+    ADD_CUSTOM_COMMAND(
+        OUTPUT  "${ANDROID_APK_UNSIGNED}"
+        COMMAND "${ANDROID_ZIPALIGN}" -f -p 4 "${ANDROID_APK_UNALIGNED_UNSIGNED}" "${ANDROID_APK_UNSIGNED}"
+        DEPENDS "${ANDROID_APK_UNALIGNED_UNSIGNED}"
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+        COMMENT "Running zipalign..."
+    )
+ENDIF()
 
 SET(PLATFORM_PATHS "")
 SET(PLATFORM_COMMANDS "")
 IF(SOURCE_FILES)
     FOREACH(PLATFORM ${ANDROID_PLATFORMS})
         LIST(APPEND PLATFORM_PATHS "lib/${PLATFORM}/lib${PROJECT_NAME}.so" )
-        LIST(APPEND PLATFORM_COMMANDS COMMAND "${ANDROID_AAPT}" add "${ANDROID_APK_UNSIGNED}" "lib/${PLATFORM}/lib${PROJECT_NAME}.so")
+        LIST(APPEND PLATFORM_COMMANDS COMMAND "${ANDROID_AAPT}" add "${ANDROID_APK_UNALIGNED_UNSIGNED}" "lib/${PLATFORM}/lib${PROJECT_NAME}.so")
     ENDFOREACH()
 ENDIF()
 IF(JAVA_FILES)
-    LIST(APPEND PLATFORM_COMMANDS COMMAND "${ANDROID_AAPT}" add "${ANDROID_APK_UNSIGNED}" "classes.dex")
+    LIST(APPEND PLATFORM_COMMANDS COMMAND "${ANDROID_AAPT}" add "${ANDROID_APK_UNALIGNED_UNSIGNED}" "classes.dex")
 ENDIF()
 
 ADD_CUSTOM_COMMAND(
-    OUTPUT  "${ANDROID_APK_UNSIGNED}"
-    COMMAND "${ANDROID_AAPT}" package -f -M "${CMAKE_SOURCE_DIR}/AndroidManifest.xml" -S "${CMAKE_SOURCE_DIR}/resources" -I "${ANDROID_JAR}" -F "${ANDROID_APK_UNSIGNED}"
+    OUTPUT  "${ANDROID_APK_UNALIGNED_UNSIGNED}"
+    COMMAND "${ANDROID_AAPT}" package -f -M "${CMAKE_SOURCE_DIR}/AndroidManifest.xml" -S "${CMAKE_SOURCE_DIR}/resources" -I "${ANDROID_JAR}" -F "${ANDROID_APK_UNALIGNED_UNSIGNED}"
     ${PLATFORM_COMMANDS}
     DEPENDS "${CMAKE_SOURCE_DIR}/AndroidManifest.xml" ${PLATFORM_PATHS} "${ANDROID_CLASSES_DEX}"
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
