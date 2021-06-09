@@ -4,7 +4,11 @@ An attempt to create an application that can communicate with a hub to allow for
 
 ## Android ##
 
-So far just a skeleton of a native app that draws to the screen. To build it you will need both the android sdk and ndk.
+The android controller opens up a bluetooth connection to the first paired device and logs any serial data received.
+
+The controller can be built either using the command line (and CMake) or Android Studio.
+
+To build on the command line you will need the paths to both the android sdk and ndk, and your java home. 
 
 ```shell
 cd controller-android
@@ -19,7 +23,7 @@ cmake \
     -DANDROID_STL=c++_static \
     -DJAVA_HOME=${JAVA_HOME} \
     ..
-cmake --build . --target apk
+cmake --build .
 ```
 
 To install and launch the app on a connected device using adb you can use this target:
