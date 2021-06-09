@@ -156,19 +156,19 @@ SET(ANDROID_STL             "c++_static")
 # NOTE: Rather when the "apk" target is built it will configure this project for each platform.
 # NOTE: The "apk" target is then tied to ALL so that it runs for the default build.
 IF(DEFINED CMAKE_TOOLCHAIN_FILE AND DEFINED ANDROID_ABI AND DEFINED ANDROID_STL)
-    # Add the native app glue code from the NDK.
-    ADD_LIBRARY(native_app_glue STATIC 
-        "${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.h"
-        "${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c"
-    )
-    TARGET_INCLUDE_DIRECTORIES(native_app_glue PUBLIC "${ANDROID_NDK}/sources/android/native_app_glue")
-
-    # Define a global symbol for the shared linker which is defined in the glue library.
-    SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
-
     # Add the project code.
     FILE(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/source/*.hpp" "${CMAKE_SOURCE_DIR}/source/*.cpp")
     IF(SOURCE_FILES)
+        # Add the native app glue code from the NDK.
+        ADD_LIBRARY(native_app_glue STATIC 
+            "${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.h"
+            "${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c"
+        )
+        TARGET_INCLUDE_DIRECTORIES(native_app_glue PUBLIC "${ANDROID_NDK}/sources/android/native_app_glue")
+
+        # Define a global symbol for the shared linker which is defined in the glue library.
+        SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
+
         ADD_LIBRARY(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 
         # Link the project to all the libraries.
