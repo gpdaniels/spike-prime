@@ -46,16 +46,16 @@ public final class preferences {
             SharedPreferences.Editor editor = database.edit();
 
             if (value instanceof Boolean) {
-                editor.putBoolean(key, (boolean)value);
+                editor.putBoolean(key, Boolean.parseBoolean(value.toString()));
             }
             else if (value instanceof Integer) {
-                editor.putInt(key, (int)value);
+                editor.putInt(key, Integer.parseInt(value.toString()));
             }
             else if (value instanceof Long) {
-                editor.putLong(key, (long)value);
+                editor.putLong(key, Long.parseLong(value.toString()));
             }
             else if (value instanceof Float) {
-                editor.putFloat(key, (float)value);
+                editor.putFloat(key, Float.parseFloat(value.toString()));
             }
             else if (value instanceof String) {
                 editor.putString(key, (String)value);

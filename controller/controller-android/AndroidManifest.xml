@@ -18,12 +18,17 @@
 <!-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN      -->
 <!-- THE SOFTWARE                                                                   -->
 <!--                                                                                -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" package="com.gpdaniels.controller">
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.gpdaniels.controller"
+    android:versionCode="2"
+    android:versionName="0.0.0"
+>
     
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED" tools:ignore="ProtectedPermissions"/>
@@ -32,7 +37,7 @@
     <uses-feature android:name="android.hardware.bluetooth" android:required="true"/>
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
     
-    <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="23" android:maxSdkVersion="30"/>
+    <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="30" android:maxSdkVersion="30"/>
           
     <application
         android:label="Controller"
