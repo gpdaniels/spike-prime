@@ -83,6 +83,8 @@ Short versions numbers are from the `version.py` files where available.
 | **v1.1.01.0002-3e5a121** | Updated filesystem using 1.3.2 on Windows (Updated on: 03/11/2020).              |
 | **v1.1.01.0002-3e5a121** | Updated filesystem using 1.3.3 on Windows (Updated on: 18/12/2020).              |
 | **v1.1.01.0002-3e5a121** | Updated filesystem using 1.3.4 on Windows (Updated on: 17/03/2021).              |
+| **v?.?.??.????-???????** | Updated filesystem using 2.0.0 on Windows (Updated on: 25/08/2021).              |
+| **v?.?.??.????-???????** | Updated filesystem using 2.0.1 on Windows (Updated on: 25/08/2021).              |
 
 #### Mindstorms Robot Inventor ####
 
@@ -156,6 +158,8 @@ Short versions numbers are from the `version.py` files where available.
 | **v1.1.01.0002-3e5a121** | Updated firmware using 1.3.2 on Windows (Updated on: 03/11/2020).                |
 | **v1.1.01.0002-3e5a121** | Updated firmware using 1.3.3 on windows (Updated on: 18/12/2020) [UNCHANGED].    |
 | **v1.1.01.0002-3e5a121** | Updated firmware using 1.3.4 on Windows (Updated on: 17/03/2021) [UNCHANGED].    |
+| **v?.?.??.????-???????** | Updated firmware using 2.0.0 on Windows (Updated on: 25/08/2021).                |
+| **v?.?.??.????-???????** | Updated firmware using 2.0.1 on Windows (Updated on: 25/08/2021).                |
 
 #### Mindstorms Robot Inventor ####
 
