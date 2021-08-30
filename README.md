@@ -1,6 +1,6 @@
 # Mindstorms / SPIKE Prime #
 
-|This repository is a collection of useful information about the Lego Mindstorms (51515) and Lego SPIKE Prime (45678).|![Mindstorms Robot Inventor Logo](https://raw.githubusercontent.com/gpdaniels/spike-prime/master/simulator/images/icon-mindstorms.png)|![SPIKE Prime Logo](https://raw.githubusercontent.com/gpdaniels/spike-prime/master/simulator/images/icon-spike.png)|
+|This repository is a collection of useful information about the Lego Mindstorms Robot Inventor (51515) and Lego SPIKE Prime (45678).|![Mindstorms Robot Inventor Logo](https://raw.githubusercontent.com/gpdaniels/spike-prime/master/simulator/images/icon-mindstorms.png)|![SPIKE Prime Logo](https://raw.githubusercontent.com/gpdaniels/spike-prime/master/simulator/images/icon-spike.png)|
 |--|--|--|
 
 ## Lego Hub Hardware ##
@@ -60,6 +60,12 @@ This is a disassembler/decompiler that uses the mpy-tool from the micropython re
 Dumps of the micropython filesystem on the Lego hub using [rshell](https://github.com/dhylands/rshell).
 
 ```shell
+# Install the rshell program if you do not already have it.
+# pip3 install rshell
+
+# Add udev rules for the hubs, and restart udev.
+# cp ./filesystem/99-lego.rules /etc/udev/rules.d/99-lego.rules
+
 rshell
 > connect serial /dev/ttyACM0 115200
 > rsync -a /pyboard ~/filesystem

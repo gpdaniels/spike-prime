@@ -1,0 +1,11 @@
+# SPIKE Prime hub in firmware update mode
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0694", ATTRS{idProduct}=="0008", SYMLINK+="spike-prime-dfu-%k", MODE="0666"
+
+# SPIKE Prime hub
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0694", ATTRS{idProduct}=="0009", SYMLINK+="spike-prime-%k", MODE="0666"
+
+# MINDSTORMS Inventor hub
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0694", ATTRS{idProduct}=="0010", SYMLINK+="mindstorms-inventor-%k", MODE="0666"
+
+# MINDSTORMS Inventor hub in firmware update mode
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0694", ATTRS{idProduct}=="0011", SYMLINK+="mindstorms-inventor-dfu-%k", MODE="0666"
