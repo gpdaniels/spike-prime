@@ -1,0 +1,10 @@
+>>> help('modules')
+__main__          micropython       ubinascii         umachine
+_onewire          sys               ubluetooth        uos
+_uasyncio         uarray            ucollections      urandom
+builtins          uasyncio/__init__ uctypes           ure
+cmath             uasyncio/core     uerrno            uselect
+firmware          uasyncio/event    uhashlib          ustruct
+gc                uasyncio/funcs    uheapq            utime
+hub               uasyncio/lock     uio               utimeq
+math              uasyncio/stream   ujson             uzlib
