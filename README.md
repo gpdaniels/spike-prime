@@ -1,6 +1,6 @@
-# Mindstorms / SPIKE Prime #
+# Mindstorms / SPIKE Prime / SPIKE Essential #
 
-|This repository is a collection of useful information about the Lego Mindstorms Robot Inventor (51515) and Lego SPIKE Prime (45678).|![Mindstorms Robot Inventor Logo](https://raw.githubusercontent.com/gpdaniels/spike-prime/master/simulator/images/icon-mindstorms.png)|![SPIKE Prime Logo](https://raw.githubusercontent.com/gpdaniels/spike-prime/master/simulator/images/icon-spike.png)|
+|This repository is a collection of useful information about the Lego Mindstorms Robot Inventor (51515), Lego SPIKE Prime (45678) and Lego SPIKE Essential (45345).|![Mindstorms Robot Inventor Logo](https://raw.githubusercontent.com/gpdaniels/spike-prime/master/simulator/images/icon-mindstorms.png)|![SPIKE Prime Logo](https://raw.githubusercontent.com/gpdaniels/spike-prime/master/simulator/images/icon-spike.png)|
 |--|--|--|
 
 ## Lego Hub Hardware ##
