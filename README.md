@@ -1,6 +1,6 @@
-# Mindstorms / SPIKE Prime #
+# Mindstorms / SPIKE Prime / SPIKE Essential #
 
-|This repository is a collection of useful information about the Lego Mindstorms Robot Inventor (51515) and Lego SPIKE Prime (45678).|![Mindstorms Robot Inventor Logo](https://raw.githubusercontent.com/gpdaniels/spike-prime/master/simulator/images/icon-mindstorms.png)|![SPIKE Prime Logo](https://raw.githubusercontent.com/gpdaniels/spike-prime/master/simulator/images/icon-spike.png)|
+|This repository is a collection of useful information about the Lego Mindstorms Robot Inventor (51515), Lego SPIKE Prime (45678) and Lego SPIKE Essential (45345).|![Mindstorms Robot Inventor Logo](https://raw.githubusercontent.com/gpdaniels/spike-prime/master/simulator/images/icon-mindstorms.png)|![SPIKE Prime Logo](https://raw.githubusercontent.com/gpdaniels/spike-prime/master/simulator/images/icon-spike.png)|
 |--|--|--|
 
 ## Lego Hub Hardware ##
@@ -199,13 +199,28 @@ The Lego specification pdfs for the electrical parts of the Lego hub.
 |                     File | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
 |            **stm32f413** | The microprocessor inside the hub.                                               |
-|      **spike-prime-hub** | The main hub.                                                                    |
-|  **spike-prime-battery** | Rechargeable lithium ion battery pack for the hub, capacity 2100 mAH.            |
-| **medium-angular-motor** | Medium motor with integrated absolute orientation sensor, accuracy +- 3 degrees. |
-|  **large-angular-motor** | Large motor with integrated absolute orientation sensor, accuracy +- 3 degrees.  |
-|         **force-sensor** | Measures touch, tap, and force up to 10N (About 1Kg) at an accuracy of 0.65N.    |
-|         **depth-sensor** | Measures depth to 2m (fast to 30cm) with 1mm resolution. Has 4 white LED outputs.|
-|        **colour-sensor** | Measures 8 colours, reflectivity, and ambient light. Has 3 white LED outputs.    |
+
+Spike Prime
+
+|                               File | Description                                                                      |
+|-----------------------------------:|:---------------------------------------------------------------------------------|
+|                      **large-hub** | The main hub.                                                                    |
+| **large-hub-rechargeable-battery** | Rechargeable lithium ion battery pack for the hub, capacity 2100 mAH.            |
+|           **medium-angular-motor** | Medium motor with integrated absolute orientation sensor, accuracy +- 3 degrees. |
+|            **large-angular-motor** | Large motor with integrated absolute orientation sensor, accuracy +- 3 degrees.  |
+|                   **force-sensor** | Measures touch, tap, and force up to 10N (About 1Kg) at an accuracy of 0.65N.    |
+|                **distance-sensor** | Measures depth to 2m (fast to 30cm) with 1mm resolution. Has 4 white LED outputs.|
+|                   **color-sensor** | Measures 8 colours, reflectivity, and ambient light. Has 3 white LED outputs.    |
+
+Spike Essential
+
+|                     File | Description                                                                                 |
+|-------------------------:|:--------------------------------------------------------------------------------------------|
+|            **small-hub** | The main hub.                                                                               |
+| **rechargeable-battery** | Rechargeable lithium ion battery pack for the hub, capacity 620 mAH.                        |
+|  **small-angular-motor** | Small motor with integrated absolute orientation sensor, accuracy +- 3 degrees.             |
+|   **color-light-matrix** | Light matrix with the capability to turn on each segment separately and in different colors.|
+|         **color-sensor** | Measures 8 colours, reflectivity, and ambient light. Has 3 white LED outputs.               |
 
 ## License ##
 
