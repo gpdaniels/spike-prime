@@ -3,19 +3,44 @@
 |This repository is a collection of useful information about the Lego Mindstorms Robot Inventor (51515), Lego SPIKE Prime (45678) and Lego SPIKE Essential (45345).|![Mindstorms Robot Inventor Logo](https://raw.githubusercontent.com/gpdaniels/spike-prime/master/simulator/images/icon-mindstorms.png)|![SPIKE Prime Logo](https://raw.githubusercontent.com/gpdaniels/spike-prime/master/simulator/images/icon-spike.png)|
 |--|--|--|
 
-## Lego Hub Hardware ##
+## Hardware ##
+
+### Large Hub Hardware ###
+
+This applies to both the SPIKE Prime and Mindstorms Robot Inventor large hubs.
 
 |                     Part | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
 |                  **CPU** | STM32F413 (Architecture: ARM Cortex M4, ROM: 1M, RAM: 320k, Clock: 100MHz).      |
 |     **Internal storage** | 32MB flash memory (IC: Winbond W25Q256JV).                                       |
-|**Wireless connectivity** | Bluetooth supporting 1 BT and 4 BTLE connections (IC: TI CC2564C).               |
+|**Wireless connectivity** | Bluetooth supporting 1 BT and 4 BLE connections (IC: TI CC2564C).                |
 |   **Wired connectivity** | Micro USB cable.                                                                 |
 |              **Display** | 25 white LEDs in a 5x5 grid and 1 RGB LED (Driver IC: TI TLC5955).               |
 |        **Motor Drivers** | 6 motor outputs (Driver ICs: 3 x LB1836).                                        |
 |   **Battery Management** | Lithium ion battery management (IC: MPS 2639A).                                  |
+|          **Accerometer** | Three-axis accelerometer (IC: ?).                                                |
+|            **Gyroscope** | Three-axis gyroscope (IC: ?).                                                    |
+|                **Ports** | 6 LPF2 ports = 4 normal speed (115kB), 2 high speed (?kB).                       |
 
-## Connecting to the hub ##
+### Small Hub Hardware ###
+
+This applies to the SPIKE Essential small hub.
+
+|                     Part | Description                                                                      |
+|-------------------------:|:---------------------------------------------------------------------------------|
+|                  **CPU** | ?                                                                                |
+|     **Internal storage** | ?                                                                                |
+|**Wireless connectivity** | Bluetooth supporting 1 BT and 4 BLE connections (IC: ?).                         |
+|   **Wired connectivity** | Micro USB cable.                                                                 |
+|              **Display** | 1 RGB LED (Driver IC: ?).                                                        |
+|        **Motor Drivers** | 2 motor outputs (Driver ICs: 1 x ?).                                             |
+|   **Battery Management** | Lithium ion battery management (IC: ?).                                          |
+|          **Accerometer** | Three-axis accelerometer (IC: ?).                                                |
+|            **Gyroscope** | Three-axis gyroscope (IC: ?).                                                    |
+|                **Ports** | 2 LPF2 ports = 2 normal speed (115kB).                                           |
+
+
+## Connecting to a hub ##
 
 To connect to the hub you have two options, a micro USB cable or bluetooth.
 Both options create a serial connection between the hub and the computer.
@@ -207,12 +232,13 @@ The simulator uses a mocked implementation of the micropython modules available 
 
 ### Specifications ###
 
-The Lego specification pdfs for the electrical parts of the Lego hub.
+Specification pdfs for internal parts of the Lego components.
 
 |                     File | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
 |            **stm32f413** | The microprocessor inside the hub.                                               |
 
+<<<<<<< HEAD
 Spike Prime
 
 |                               File | Description                                                                      |
@@ -234,6 +260,29 @@ Spike Essential
 |  **small-angular-motor** | Small motor with integrated absolute orientation sensor, accuracy +- 3 degrees.             |
 |   **color-light-matrix** | Light matrix with the capability to turn on each segment separately and in different colors.|
 |         **color-sensor** | Measures 8 colours, reflectivity, and ambient light. Has 3 white LED outputs.               |
+=======
+#### SPIKE Prime ####
+
+|                     File | Description                                                                      |
+|-------------------------:|:---------------------------------------------------------------------------------|
+|            **large-hub** | The main SPIKE Prime hub.                                                        |
+| **large-hub-rechargeable-battery** | Rechargeable lithium ion battery pack for the hub, capacity 2100 mAH.            |
+| **medium-angular-motor** | Medium motor with integrated absolute orientation sensor, accuracy +- 3 degrees. |
+|  **large-angular-motor** | Large motor with integrated absolute orientation sensor, accuracy +- 3 degrees.  |
+|         **force-sensor** | Measures touch, tap, and force up to 10N (About 1Kg) at an accuracy of 0.65N.    |
+|      **distance-sensor** | Measures depth to 2m (fast to 30cm) with 1mm resolution. Has 4 white LED outputs.|
+|         **color-sensor** | Measures 8 colours, reflectivity, and ambient light. Has 3 white LED outputs.    |
+
+#### SPIKE Essential ####
+
+|                     File | Description                                                                      |
+|-------------------------:|:---------------------------------------------------------------------------------|
+|            **small-hub** | The smaller SPIKE Essential hub.                                                 |
+| **small-hub-rechargeable-battery** | Rechargeable lithium ion battery pack for the hub, capacity 620 mAH.             |
+|  **small-angular-motor** | Small motor with integrated absolute orientation sensor, accuracy +- 3 degrees.  |
+|   **color-light-matrix** | 3x3 RGB Light matrix with individual segment control.                            |
+|         **color-sensor** | Measures 8 colours, reflectivity, and ambient light. Has 3 white LED outputs.    |
+>>>>>>> 73b6c21619d4688a5db62d6a04437c280043f2ea
 
 ## License ##
 
