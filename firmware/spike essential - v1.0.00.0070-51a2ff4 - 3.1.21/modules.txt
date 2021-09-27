@@ -1,0 +1,10 @@
+>>> help('modules')
+__main__          math              uhashlib          uselect
+_onewire          micropython       uheapq            ustruct
+_uasyncio         uarray            uio               usys
+builtins          ubinascii         ujson             utime
+cmath             ubluetooth        umachine          utimeq
+firmware          ucollections      uos               uzlib
+gc                uctypes           urandom
+hub               uerrno            ure
+Plus any modules on the filesystem
