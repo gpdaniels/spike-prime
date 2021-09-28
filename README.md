@@ -38,13 +38,7 @@ This applies to the SPIKE Essential small hub.
 |          **Accerometer** | Three-axis accelerometer (IC: ?).                                                |
 |            **Gyroscope** | Three-axis gyroscope (IC: ?).                                                    |
 |                **Ports** | 2 LPF2 ports = 2 normal speed (115kB).                                           |
-<<<<<<< HEAD
 
-
-=======
-
-
->>>>>>> gpdaniels-master
 ## Connecting to a hub ##
 
 To connect to the hub you have two options, a micro USB cable or bluetooth.
