@@ -116,6 +116,7 @@ Short versions numbers are from the `version.py` files where available.
 | **v1.1.01.0002-3e5a121** | Updated filesystem using 1.3.4 on Windows (Updated on: 17/03/2021).              |
 | **v1.2.01.0101-edc1be7** | Updated filesystem using 2.0.0 on Windows (Updated on: 25/08/2021).              |
 | **v1.2.01.0101-edc1be7** | Updated filesystem using 2.0.1 on Windows (Updated on: 25/08/2021) [UNCHANGED].  |
+| **v1.3.00.0000-e8c274a** | Updated filesystem using 2.0.3 on Windows (Updated on: 03/11/2021).              |
 
 #### SPIKE Essential ####
 
@@ -199,12 +200,13 @@ Short versions numbers are from the `version.py` files where available.
 | **v1.1.01.0002-3e5a121** | Updated firmware using 1.3.4 on Windows (Updated on: 17/03/2021) [UNCHANGED].    |
 | **v1.2.01.0101-edc1be7** | Updated firmware using 2.0.0 on Windows (Updated on: 25/08/2021).                |
 | **v1.2.01.0101-edc1be7** | Updated firmware using 2.0.1 on Windows (Updated on: 25/08/2021) [UNCHANGED].    |
+| **v1.3.00.0000-e8c274a** | Updated firmware using 2.0.3 on Windows (Updated on: 03/11/2021).                |
 
 #### SPIKE Essential ####
 
 |                     Dump | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
-| **v1.0.00.0070-51a2ff4** | **MISSING** Initial filesystem (Purchased on: 27/09/2021) (Box Version: 143).    |
+| **v1.0.00.0070-51a2ff4** | **MISSING** Initial firmware (Purchased on: 27/09/2021) (Box Version: 143).      |
 
 #### Mindstorms Robot Inventor ####
 
