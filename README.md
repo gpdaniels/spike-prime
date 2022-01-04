@@ -134,6 +134,7 @@ Short versions numbers are from the `version.py` files where available.
 | **v1.0.06.0034-b0c335b** | Updated filesystem using 10.0.3 on Android (Updated on: 29/11/2020).             |
 | **v1.2.01.0103-d08b6fe** | Updated filesystem using 10.1.0 on Android (Updated on: 05/05/2021).             |
 | **v1.3.00.0203-71f6a41** | Updated filesystem using 10.2.0 on Android (Updated on: 19/08/2021).             |
+| **v1.4.01.0000-594ce3d** | Updated filesystem using 10.3.0 on Android (Updated on: 13/12/2021).             |
 
 ### Firmware ###
 
@@ -217,6 +218,7 @@ Short versions numbers are from the `version.py` files where available.
 | **v1.0.06.0034-b0c335b** | Updated firmware using 10.0.3 on Android (Updated on: 29/11/2020) [UNCHANGED].   |
 | **v1.2.01.0103-d08b6fe** | Updated firmware using 10.1.0 on Android (Updated on: 05/05/2021).               |
 | **v1.3.00.0203-71f6a41** | Updated firmware using 10.2.0 on Android (Updated on: 19/08/2021).               |
+| **v1.4.01.0000-594ce3d** | Updated firmware using 10.3.0 on Android (Updated on: 13/12/2021).               |
 
 ### Simulator ###
 
@@ -231,6 +233,7 @@ The simulator uses a mocked implementation of the micropython modules available 
 |-------------------------:|:---------------------------------------------------------------------------------|
 |         **simulator.py** | A python3 gui based simulator for the Lego hub.                                  |
 |               **run.py** | A python3 script to run a micropython script on a connected Lego hub.            |
+|            **upload.py** | A python3 script to upload a micropython script to a connected Lego hub.         |
 
 ### Specifications ###
 
