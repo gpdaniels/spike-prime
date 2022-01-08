@@ -243,7 +243,7 @@ Specification pdfs for internal parts of the Lego components.
 |-------------------------:|:---------------------------------------------------------------------------------|
 |            **stm32f413** | The microprocessor inside the hub.                                               |
 
-#### SPIKE Prime ####
+#### SPIKE Prime and Mindstorms Robot Inventor ####
 
 |                     File | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
