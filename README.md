@@ -18,8 +18,8 @@ This applies to both the SPIKE Prime and Mindstorms Robot Inventor large hubs.
 |              **Display** | 25 white LEDs in a 5x5 grid and 1 RGB LED (Driver IC: TI TLC5955).               |
 |        **Motor Drivers** | 6 motor outputs (Driver ICs: 3 x LB1836).                                        |
 |   **Battery Management** | Lithium ion battery management (IC: MPS 2639A).                                  |
-|          **Accerometer** | Three-axis accelerometer (IC: ?).                                                |
-|            **Gyroscope** | Three-axis gyroscope (IC: ?).                                                    |
+|          **Accerometer** | Three-axis accelerometer (IC: LSM6DS3TR).                                        |
+|            **Gyroscope** | Three-axis gyroscope (IC: LSM6DS3TR).                                            |
 |                **Ports** | 6 LPF2 ports = 4 normal speed (115kB), 2 high speed (?kB).                       |
 
 ### Small Hub Hardware ###
@@ -35,8 +35,8 @@ This applies to the SPIKE Essential small hub.
 |              **Display** | 1 RGB LED (Driver IC: ?).                                                        |
 |        **Motor Drivers** | 2 motor outputs (Driver ICs: 1 x ?).                                             |
 |   **Battery Management** | Lithium ion battery management (IC: ?).                                          |
-|          **Accerometer** | Three-axis accelerometer (IC: ?).                                                |
-|            **Gyroscope** | Three-axis gyroscope (IC: ?).                                                    |
+|          **Accerometer** | Three-axis accelerometer (IC: LSM6DS3TR).                                        |
+|            **Gyroscope** | Three-axis gyroscope (IC: LSM6DS3TR).                                            |
 |                **Ports** | 2 LPF2 ports = 2 normal speed (115kB).                                           |
 
 
