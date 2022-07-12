@@ -234,6 +234,7 @@ class simulator_gui(metaclass=singleton):
         
         # Create a restricted version of the import function.
         def restricted_import(name, globals=None, locals=None, fromlist=(), level=0):
+            print("Importing '" + name + "' from '" + globals["__name__"] + "'...")
             # If we are check for special "simulator_" imports.
             # We override simulator_gui imports with the gui class.
             if (name == "simulator_gui"):
@@ -241,8 +242,8 @@ class simulator_gui(metaclass=singleton):
             # We override other "simulator_" imports with the name after the underscore.
             if (name.startswith("simulator_")):
                 return importlib.__import__(name.split("_")[1], globals, locals, fromlist, level)
-            # A couple of modules are always allowd, to help debugging.
-            if (name in ["marshal", "traceback"]):
+            # A few modules that are always allowed, to help debugging.
+            if (globals["__name__"].startswith(("zipimport", "runpy", "pkgutil", "_pydevd_bundle", "importlib"))):
                 return importlib.__import__(name, globals, locals, fromlist, level)
             # Next check if we have already loaded it.
             if (name in self.loaded_modules):

@@ -37,5 +37,5 @@ display.pixel(0,0,0)
 # 00000 -> 00000 -> 00000 -> 00000 -> 00000 -> 00000
 # 00000    00000    00000    00000    00000    00000
 # 00000    00000    00000    0000#    00000    #0000
-#
+
 # It seems that the display.pixel(...) command opperates on the display rotated by twice the amount?
