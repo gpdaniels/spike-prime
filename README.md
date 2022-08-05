@@ -137,6 +137,7 @@ Short versions numbers are from the `version.py` files where available.
 | **v1.2.01.0103-d08b6fe** | Updated filesystem using 10.1.0 on Android (Updated on: 05/05/2021).             |
 | **v1.3.00.0203-71f6a41** | Updated filesystem using 10.2.0 on Android (Updated on: 19/08/2021).             |
 | **v1.4.01.0000-594ce3d** | Updated filesystem using 10.3.0 on Android (Updated on: 13/12/2021).             |
+| **v1.4.02.0000-f7a19ce** | Updated filesystem using 10.4.0 on Android (Updated on: 05/08/2022).             |
 
 ### Firmware ###
 
@@ -223,6 +224,7 @@ Short versions numbers are from the `version.py` files where available.
 | **v1.2.01.0103-d08b6fe** | Updated firmware using 10.1.0 on Android (Updated on: 05/05/2021).               |
 | **v1.3.00.0203-71f6a41** | Updated firmware using 10.2.0 on Android (Updated on: 19/08/2021).               |
 | **v1.4.01.0000-594ce3d** | Updated firmware using 10.3.0 on Android (Updated on: 13/12/2021).               |
+| **v1.4.02.0000-f7a19ce** | Updated firmware using 10.4.0 on Android (Updated on: 05/08/2022).               |
 
 ### Simulator ###
 
