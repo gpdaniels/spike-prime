@@ -1,32 +1,34 @@
 #!/usr/bin/python3
 
 # A Hub:
-#    ___________________________ 
+#    ___________________________
 #   |                           |
-#   |     ┌---┐          .-.    | 
-#   |     | L |         ( B )   | 
-#   |     └---┘          '-'    | 
+#   |     ┌---┐          .-.    |
+#   |     | L |         ( B )   |
+#   |     └---┘          '-'    |
 #   |                           |
 #   | A  [ ] [ ] [ ] [ ] [ ]  B |
-#   |                           | 
+#   |                           |
 #   |    [ ] [ ] [ ] [ ] [ ]    |
-#   |                           | 
+#   |                           |
 #   | C  [ ] [ ] [ ] [ ] [ ]  D |
-#   |                           | 
+#   |                           |
 #   |    [ ] [ ] [ ] [ ] [ ]    |
-#   |                           | 
-#   | E  [ ] [ ] [ ] [ ] [ ]  F | 
+#   |                           |
+#   | E  [ ] [ ] [ ] [ ] [ ]  F |
 #   |                           |
 #   |           .---.           |
 #   |    .-----/     \-----.    |
 #   |   ( <   :       :   > )   |
 #   |    '-----\     /-----'    |
 #   |           '---'           |
-#   |___________________________| 
+#   |___________________________|
 
 import argparse
 import builtins
+import gi.repository
 import importlib
+import math
 import os
 import pathlib
 import runpy
@@ -49,28 +51,84 @@ class singleton(type):
         else:
             return self.__instance
 
+
+# Widget to visualise a large lego motor.
+class MotorLargeWidget(object):
+    def __init__(self, port):
+        self.window = tkinter.Toplevel()
+        self.window.title(f"Large Motor : {port}")
+        self.window.resizable(False, False)
+        self.iconphoto_image = tkinter.PhotoImage(file = "./tiles/motor-large-axle.png")
+        self.window.iconphoto(False, self.iconphoto_image)
+        def on_closing():
+            simulator_gui().ports[port] = None
+            self.window.destroy()
+        self.window.protocol("WM_DELETE_WINDOW", on_closing)
+        self.canvas = tkinter.Canvas(self.window, width=300, height=450)
+        self.background_image = tkinter.PhotoImage(file = "./images/motor-large.png")
+        self.canvas.create_image(150, 200, image=self.background_image)
+        self.canvas.grid(column=0, row=0)
+        self.angle = tkinter.Scale(self.window, from_=-360, to=360, length=200, tickinterval=180, orient=tkinter.HORIZONTAL)
+        self.angle.grid(column=0, row=1)
+        self.axle_image = tkinter.PhotoImage(file = "./tiles/motor-large-axle.png")
+        self.axle_image_rotated = self.axle_image
+        self.axle_image_current_angle = 0
+        self.canvas_axle_image = self.canvas.create_image(150, 336, image=self.axle_image_rotated)
+
+    def rotate_photo_image(self, image, angle):
+        angleInRads = angle * math.pi / 180
+        diagonal = math.sqrt(image.width()**2 + image.height()**2)
+        midpoint_x = image.width() / 2
+        midpoint_y = image.height() / 2
+        result = tkinter.PhotoImage(width=int(diagonal), height=int(diagonal))
+        for x in range(image.width()):
+            for y in range(image.height()):
+                xnew = float(x) - midpoint_x
+                ynew = float(-y) + midpoint_y
+                xnew, ynew = xnew * math.cos(angleInRads) - ynew * math.sin(angleInRads), xnew * math.sin(angleInRads) + ynew * math.cos(angleInRads)
+                xnew = (xnew + diagonal / 2)
+                ynew = -(ynew - diagonal / 2)
+                rgb = '#%02x%02x%02x' % image.get(x, y)
+                if rgb == "#000000":
+                    continue
+                result.put(rgb, (int(xnew), int(ynew)))
+                result.put(rgb, (int(xnew+1), int(ynew)))
+        return result
+
+    def update(self):
+        if self.axle_image_current_angle == self.angle.get():
+            return
+        self.canvas.delete(self.canvas_axle_image)
+        self.axle_image_current_angle = self.angle.get()
+        self.axle_image_rotated = self.rotate_photo_image(self.axle_image, self.axle_image_current_angle)
+        self.canvas_axle_image = self.canvas.create_image(150, 336, image=self.axle_image_rotated)
+
+
 # The core of the simulator, provides access to the simulated hardware and runs the graphical user interface.
 class simulator_gui(metaclass=singleton):
     # Constructor creates the gui.
-    def __init__(self, skip_animation = False, script_path = "", output_path = ""):
+    def __init__(self, skip_animation = False, api = "spike", script_path = "", output_path = ""):
         self.skip_animation = skip_animation
         self.script_path = script_path
         self.output_path = output_path
-        
+
         print("Initialising Lego hub simulator gui...")
         self.setup = False
         self.ready = False
         self.closing = False
-        
+
         print("Creating the simulator window...")
         self.window = tkinter.Tk()
-        self.window.title("Lego Hub simulator")
-        self.window.geometry("1280x720+50+50")
+        self.window.title("Lego Hub Simulator")
         self.window.resizable(False, False)
-        self.iconphoto_image = tkinter.PhotoImage(file = "./images/icon-spike.png")
-        #self.iconphoto_image = tkinter.PhotoImage(file = "./images/icon-mindstorms.png")
+
+        # Select the API icon.
+        if api == "spike":
+            self.iconphoto_image = tkinter.PhotoImage(file = "./images/icon-spike.png")
+        elif api == "mindstorms":
+            self.iconphoto_image = tkinter.PhotoImage(file = "./images/icon-mindstorms.png")
         self.window.iconphoto(False, self.iconphoto_image)
-        
+
         print("Enabling hidden file browsing...")
         # Create an impossible dummy dialog to avoid getting a dialog window (throws a TclError).
         try:
@@ -80,69 +138,80 @@ class simulator_gui(metaclass=singleton):
         # Now the the internal state is initialised we can set some magic variables to avoid hidden files.
         self.window.tk.call('set', '::tk::dialog::file::showHiddenBtn', '1')
         self.window.tk.call('set', '::tk::dialog::file::showHiddenVar', '0')
-        
+
         print("Adding a menu...")
         self.menu_main = tkinter.Menu()
-        
+
         # Find all the api directories available.
         self.api_root = os.path.join(os.path.dirname(os.path.realpath(__file__)), "api")
         self.api_directories = [directory for directory in os.listdir(self.api_root) if os.path.isdir(os.path.join(self.api_root, directory))]
-        
+
         # Add them all as possible api directories.
         self.api_path_option = tkinter.StringVar()
         self.menu_api = tkinter.Menu(self.menu_main, tearoff=False)
         for api_directory in self.api_directories:
             self.menu_api.add_radiobutton(label=api_directory, variable=self.api_path_option, value=api_directory)
-        self.api_path_option.set(self.api_directories[0])
+        for api_directory in self.api_directories:
+            if api_directory == api:
+                self.api_path_option.set(api_directory)
+                break
         self.menu_main.add_cascade(label="API", menu=self.menu_api)
 
         self.menu_main.add_separator()
-        
+
+        # Add a hub reset button, and bind it to the shortcut ctrl-r.
+        self.menu_main.add_command(label="Reset Hub", command=self.reset_state())
+        self.window.bind('<Control-r>', lambda event: self.reset_state())
+
+        self.menu_main.add_separator()
+
         # Add a script loading button, and bind it to the shortcut ctrl-o.
         self.menu_main.add_command(label="Load Script", command=self.load_script)
         self.window.bind('<Control-o>', lambda event: self.load_script())
-        
+
         self.menu_main.add_separator()
-        
-        # Add a script loading button, and bind it to the shortcut ctrl-o.
-        self.menu_main.add_command(label="Save screenshot", command=self.save_screenshot)
+
+        # Add a screenshot saving button, and bind it to the shortcut ctrl-s.
+        self.menu_main.add_command(label="Screenshot", command=self.save_screenshot)
         self.window.bind('<Control-s>', lambda event: self.save_screenshot())
-        
+
         self.window.configure(menu=self.menu_main)
-        
+
         # Setup hub state.
         print("Configuring initial hub state...")
         self.reset_state()
-        
-        print("Loading hub image...")
-        self.background_image = tkinter.PhotoImage(file = "./images/prime.png")
-        self.background_label = tkinter.Label(self.window, image=self.background_image)
+
+        print("Loading hub canvas...")
+        self.hub_canvas = tkinter.Canvas(self.window, width=320, height=500, bd=0, highlightthickness=0)
+        self.background_image = tkinter.PhotoImage(file = "./images/hub.png")
+        self.background_label = tkinter.Label(self.hub_canvas, image=self.background_image)
         self.background_label.place(x=0, y=0)
-        
+        self.hub_canvas.pack()
+
         print("Loading bluetooth button...")
         self.bluetooth_image = tkinter.PhotoImage(file = "./tiles/bluetooth.png")
-        self.bluetooth = tkinter.Label(self.window, image=self.bluetooth_image, bg=self.rgb_to_hex(255, 255, 255), borderwidth=0, width=55, height=55)
+        self.bluetooth = tkinter.Label(self.hub_canvas, image=self.bluetooth_image, bg=self.rgb_to_hex(255, 255, 255), borderwidth=0, width=55, height=55)
         self.bluetooth.place(x=224, y=41)
         def bluetooth_press():
             for callback in self.bluetooth_on_press:
-                callback()        
+                callback()
         def bluetooth_release():
             for callback in self.bluetooth_on_release:
                 callback()
         self.bluetooth.bind("<Button-1>", lambda event: bluetooth_press())
         self.bluetooth.bind("<ButtonRelease-1>", lambda event: bluetooth_release())
-        
+
         print("Loading light images...")
         self.light_image = tkinter.PhotoImage(file = "./tiles/light.png")
         self.lights = [[None] * 5 for i in range(5)]
         for x in range(5):
             for y in range(5):
-                self.lights[x][y] = tkinter.Label(self.window, image=self.light_image, bg=self.rgb_to_hex(255, 255, 255), borderwidth=0, width=42, height=42)
-                self.lights[x][y].place(x=46 + (43 + 4) * x, y=129 + (43 + 4) * y)            
-        
+                self.lights[x][y] = tkinter.Label(self.hub_canvas, image=self.light_image, bg=self.rgb_to_hex(255, 255, 255), borderwidth=0, width=42, height=42)
+                self.lights[x][y].place(x=46 + (43 + 4) * x, y=129 + (43 + 4) * y)
+
         print("Loading centre button...")
         self.button_image = tkinter.PhotoImage(file = "./tiles/button.png")
-        self.button = tkinter.Label(self.window, image=self.button_image, bg=self.rgb_to_hex(255, 255, 255), borderwidth=0, width=88, height=88)
+        self.button = tkinter.Label(self.hub_canvas, image=self.button_image, bg=self.rgb_to_hex(255, 255, 255), borderwidth=0, width=88, height=88)
         self.button.place(x=117, y=383)
         def button_press():
             for callback in self.button_on_press:
@@ -152,22 +221,22 @@ class simulator_gui(metaclass=singleton):
                 callback()
         self.button.bind("<Button-1>", lambda event: button_press())
         self.button.bind("<ButtonRelease-1>", lambda event: button_release())
-        
+
         print("Loading left and right buttons...")
         self.left_image = tkinter.PhotoImage(file = "./tiles/left.png")
-        self.left = tkinter.Label(self.window, image=self.left_image, borderwidth=0, width=73, height=46)
+        self.left = tkinter.Label(self.hub_canvas, image=self.left_image, borderwidth=0, width=73, height=46)
         self.left.place(x=44, y=404)
         def left_press():
             for callback in self.left_on_press:
-                callback()            
+                callback()
         def left_release():
             for callback in self.left_on_release:
                 callback()
         self.left.bind("<Button-1>", lambda event: left_press())
         self.left.bind("<ButtonRelease-1>", lambda event: left_release())
         self.right_image = tkinter.PhotoImage(file = "./tiles/right.png")
-        self.right = tkinter.Label(self.window, image=self.right_image, borderwidth=0, width=73, height=46)
-        self.right.place(x=205, y=404)            
+        self.right = tkinter.Label(self.hub_canvas, image=self.right_image, borderwidth=0, width=73, height=46)
+        self.right.place(x=205, y=404)
         def right_press():
             for callback in self.right_on_press:
                 callback()
@@ -176,28 +245,92 @@ class simulator_gui(metaclass=singleton):
                 callback()
         self.right.bind("<Button-1>", lambda event: right_press())
         self.right.bind("<ButtonRelease-1>", lambda event: right_release())
-        
+
+        print("Loading port label buttons...")
+        self.port_a_string = tkinter.StringVar()
+        self.port_a_string.set("A")
+        self.port_a = tkinter.Label(self.hub_canvas, textvariable=self.port_a_string)
+        self.port_a.config(fg="grey")
+        self.port_a.config(bg="white")
+        self.port_a.config(font=("sans-serif", 15))
+        self.port_a.place(x=17+269*0, y=145+90*0)
+        self.port_a.bind("<ButtonRelease-1>", lambda event: self.set_port_accessory("A"))
+
+        self.port_b_string = tkinter.StringVar()
+        self.port_b_string.set("B")
+        self.port_b = tkinter.Label(self.hub_canvas, textvariable=self.port_b_string)
+        self.port_b.config(fg="grey")
+        self.port_b.config(bg="white")
+        self.port_b.config(font=("sans-serif", 15))
+        self.port_b.place(x=17+269*1, y=145+90*0)
+        self.port_b.bind("<ButtonRelease-1>", lambda event: self.set_port_accessory("B"))
+
+        self.port_c_string = tkinter.StringVar()
+        self.port_c_string.set("C")
+        self.port_c = tkinter.Label(self.hub_canvas, textvariable=self.port_c_string)
+        self.port_c.config(fg="grey")
+        self.port_c.config(bg="white")
+        self.port_c.config(font=("sans-serif", 15))
+        self.port_c.place(x=17+269*0, y=145+90*1)
+        self.port_c.bind("<ButtonRelease-1>", lambda event: self.set_port_accessory("C"))
+
+        self.port_d_string = tkinter.StringVar()
+        self.port_d_string.set("D")
+        self.port_d = tkinter.Label(self.hub_canvas, textvariable=self.port_d_string)
+        self.port_d.config(fg="grey")
+        self.port_d.config(bg="white")
+        self.port_d.config(font=("sans-serif", 15))
+        self.port_d.place(x=17+269*1, y=145+90*1)
+        self.port_d.bind("<ButtonRelease-1>", lambda event: self.set_port_accessory("D"))
+
+        self.port_e_string = tkinter.StringVar()
+        self.port_e_string.set("E")
+        self.port_e = tkinter.Label(self.hub_canvas, textvariable=self.port_e_string)
+        self.port_e.config(fg="grey")
+        self.port_e.config(bg="white")
+        self.port_e.config(font=("sans-serif", 15))
+        self.port_e.place(x=17+269*0, y=145+90*2)
+        self.port_e.bind("<ButtonRelease-1>", lambda event: self.set_port_accessory("E"))
+
+        self.port_f_string = tkinter.StringVar()
+        self.port_f_string.set("F")
+        self.port_f = tkinter.Label(self.hub_canvas, textvariable=self.port_f_string)
+        self.port_f.config(fg="grey")
+        self.port_f.config(bg="white")
+        self.port_f.config(font=("sans-serif", 15))
+        self.port_f.place(x=17+269*1, y=145+90*2)
+        self.port_f.bind("<ButtonRelease-1>", lambda event: self.set_port_accessory("F"))
+
         def set_closing():
             self.closing = True
         self.window.protocol("WM_DELETE_WINDOW", set_closing)
-        
-        print("Setup done.")
+
+        self.ports = dict()
+        for port in ['A', 'B', 'C', 'D', 'E', 'F']:
+            self.ports[port] = None
+
         self.setup = True
-        
+
+        print("Setup done.")
+
     def rgb_to_hex(self, red, green, blue):
-        return "#%02x%02x%02x" % (red, green, blue)  
+        return "#%02x%02x%02x" % (red, green, blue)
 
     def hex_to_rgb(self, colour_code):
         return tuple(int(colour_code[i:i+2], 16) for i in (1, 3, 5))
 
     def mainloop(self):
         # Start the main loop of the gui.
-        print("Starting the GUI...")
-        if (self.skip_animation == False):
-            self.animation_startup()
+        print("Starting the GUI...", )
+        if (self.skip_animation == True):
+            print("Skipping animation.", )
+            if self.api_path_option.get() == "spike":
+                self.set_image("09090:99999:99999:09990:00900")
+            elif self.api_path_option.get() == "mindstorms":
+                self.set_image("09000:09900:09990:09900:09000")
         else:
-            self.set_image("09090:99999:99999:09990:00900")
-        
+            self.animation_startup()
+
         print("Starting the main loop...")
         self.ready = True
         if (not self.script_path == ""):
@@ -205,33 +338,46 @@ class simulator_gui(metaclass=singleton):
         while self.closing == False:
             self.window.update_idletasks()
             self.window.update()
+            for port, attachement in self.ports.items():
+                if attachement:
+                    attachement.window.update_idletasks()
+                    attachement.window.update()
+                    attachement.update()
             time.sleep(0.01)
+
         self.ready = False
-        
+
         # Close the window
         print("Closing the GUI...")
+
+        for port, attachement in self.ports.items():
+            if attachement:
+                self.ports[port].window.destroy()
+                self.ports[port] = None
+
         if (self.skip_animation == False):
             self.animation_shutdown()
+
         self.window.destroy()
         self.setup = False
-        
+
         print("Done.")
-            
+
     def load_script(self, script_path = ""):
         if (not self.ready == True):
             print("Simulator startup not complete.")
             return
-        
+
         if (script_path == ""):
             print("Opening file dialog...")
-            file = tkinter.filedialog.askopenfile(initialdir = str(pathlib.Path.cwd()), title = "Select file", mode ='r', filetypes =[('Python Files', '*.py')]) 
+            file = tkinter.filedialog.askopenfile(initialdir = str(pathlib.Path.cwd()), title = "Select file", mode ='r', filetypes =[('Python Files', '*.py')])
             if file is None:
                 print("Cancelled loading file.")
                 return;
             script_path = file.name
-        
+
         print("Executing file '" + script_path + "'...")
-        
+
         # Create a restricted version of the import function.
         def restricted_import(name, globals=None, locals=None, fromlist=(), level=0):
             print("Importing '" + name + "' from '" + globals["__name__"] + "'...")
@@ -262,14 +408,14 @@ class simulator_gui(metaclass=singleton):
                 # If loading fails, restore the original import command and rethrow.
                 builtins.__import__ = importlib.__import__
                 raise exception
-             
-        # Override the normal import function with the limited version.   
+
+        # Override the normal import function with the limited version.
         builtins.__import__ = restricted_import
-        
+
         if (not self.output_path == ""):
             stdout_temp = sys.stdout
             sys.stdout = open(self.output_path, 'w')
-        
+
         # Run the script.
         try:
             runpy.run_path(script_path, run_name='__main__')
@@ -293,7 +439,7 @@ class simulator_gui(metaclass=singleton):
                 sct_img = sct.grab(monitor)
                 # Save to the picture file.
                 mss.tools.to_png(sct_img.rgb, sct_img.size, output=screenshot_path)
-                print("Screenshot saved to '{}'.".format(screenshot_path))
+                print(f"Screenshot saved to '{screenshot_path}'.")
         except:
             print("Failed to capture screenshot, ensure you have the mss package installed.")
 
@@ -305,14 +451,23 @@ class simulator_gui(metaclass=singleton):
         self.orientation = (0.0, 0.0, 0.0)
         self.accerometer = (0.0, 0.0, 0.0)
         self.gyroscope = (0.0, 0.0, 0.0)
-        self.bluetooth_on_press = []
-        self.bluetooth_on_release = []
-        self.button_on_press = []
-        self.button_on_release = []
-        self.left_on_press = []
-        self.left_on_release = []
-        self.right_on_press = []
-        self.right_on_release = []
+        self.bluetooth_on_press = [lambda: print("bt down")]
+        self.bluetooth_on_release = [lambda: print("bt up")]
+        self.button_on_press = [lambda: print("main down")]
+        self.button_on_release = [lambda: print("main up")]
+        self.left_on_press = [lambda: print("left down")]
+        self.left_on_release = [lambda: print("left up")]
+        self.right_on_press = [lambda: print("right down")]
+        self.right_on_release = [lambda: print("right up")]
+
+    def set_port_accessory(self, port):
+        print(f"Configuring a port accessory on port {port}...")
+        # TODO: Add/Remote a port accessory properly...
+        if self.ports[port]:
+            self.ports[port].window.destroy()
+            self.ports[port] = None
+        else:
+            self.ports[port] = MotorLargeWidget(port)
 
     def add_bluetooth_callbacks(self, on_press, on_release):
         self.bluetooth_on_press.append(on_press)
@@ -332,7 +487,7 @@ class simulator_gui(metaclass=singleton):
 
     def get_bluetooth(self):
         return self.hex_to_rgb(self.bluetooth['bg'])
-        
+
     def set_bluetooth(self, red, green, blue):
         assert((red >= 0) and (red <= 255))
         assert((green >= 0) and (green <= 255))
@@ -398,10 +553,10 @@ class simulator_gui(metaclass=singleton):
                 assert(int(image_string[y * 6 + x]) <= 9)
                 self.set_pixel(x, y, int(image_string[y * 6 + x]))
                 self.lights[x][y].update()
-    
+
     def get_temperature(self):
         return self.temperature
-        
+
     def set_temperature(self, temperature):
         self.temperature = temperature
 
@@ -458,7 +613,7 @@ class simulator_gui(metaclass=singleton):
         from AppKit import NSSound
         from AppKit import NSObject
         from AppKit import NSData
-        
+
         nssound = NSSound.alloc()
         data = NSData.alloc().initWithBytes_length_(wav_file_as_byte_array, len(wav_file_as_byte_array))
         nssound.initWithData_(data)
@@ -472,15 +627,14 @@ class simulator_gui(metaclass=singleton):
             def __init__(self):
                 import gi
                 gi.require_version("Gst", "1.0")
-                
+
                 from gi.repository import GObject
                 from gi.repository import Gst
-                
-                GObject.threads_init()
+
                 Gst.init(None)
-                
+
                 self.buffer = None
-                self.mainloop = GObject.MainLoop()
+                self.mainloop = gi.repository.GLib.MainLoop()
 
                 # This creates a playbin pipeline and using the appsrc source we can feed it our stream data
                 self.pipeline = Gst.ElementFactory.make("playbin", None)
@@ -519,7 +673,7 @@ class simulator_gui(metaclass=singleton):
             def on_source_need_data(self, source, length):
                 # Attempt to read data from the stream
                 data = self.buffer
-                
+
                 # If data is empty it's the end of stream
                 if not data:
                     source.emit("end-of-stream")
@@ -556,7 +710,8 @@ class simulator_gui(metaclass=singleton):
             self.play_sound_linux(wav)
         else:
             NotImplementedError("Unknown system '{}' is not supported.".format(system))
-        
+
+    # Startup animation.
     def animation_startup(self):
         for percent in range(100, 0, -10):
             self.set_led(255, 255, int(80.0 * (float(percent) / 100.0)))
@@ -593,9 +748,12 @@ class simulator_gui(metaclass=singleton):
             ["07777:77798:87077:77777:77787", 9],
             ["97777:77787:87077:77777:77787", 8],
             ["87777:77787:87977:77777:77787", 28],
-            ["99999:99999:99999:99999:99999", 215],
-            ["09090:99999:99999:09990:00900", 500]
+            ["99999:99999:99999:99999:99999", 215]
         ]
+        if self.api_path_option.get() == "spike":
+            frames.append(["09090:99999:99999:09990:00900", 500])
+        elif self.api_path_option.get() == "mindstorms":
+            frames.append(["09000:09900:09990:09900:09000", 500])
         sound_thread = threading.Thread(target=self.play_sound, args=["./sounds/startup"], kwargs={})
         sound_thread.start()
         for frame in frames:
@@ -626,10 +784,12 @@ class simulator_gui(metaclass=singleton):
 if __name__ == "__main__":
     print("Parsing arguments...")
     parser = argparse.ArgumentParser(description="Simulate a hub allowing local testing of micropython scripts.")
-    parser.add_argument("-s", "--skip_animation", help="Reboot the hub before connecting\n", action='store_true')
-    parser.add_argument("script_path", nargs='?', help="Script file name to run", default="")
-    parser.add_argument("output_path", nargs='?', help="Output file to used for responses from the hub.\n", default="")
+    parser._actions[0].help = "Show this help message and exit."
+    parser.add_argument("-s", "--skip_animation", help="Reboot the hub before connecting.", action='store_true')
+    parser.add_argument("-a", "--api", help="Select the API to use.", choices=["spike", "mindstorms"], default="spike")
+    parser.add_argument("script_path", nargs='?', help="Script file name to run.", default="")
+    parser.add_argument("output_path", nargs='?', help="Output file to used for responses from the hub.", default="")
     arguments = parser.parse_args()
-    
-    gui = simulator_gui(arguments.skip_animation, arguments.script_path, arguments.output_path)
+
+    gui = simulator_gui(arguments.skip_animation, arguments.api, arguments.script_path, arguments.output_path)
     gui.mainloop()
