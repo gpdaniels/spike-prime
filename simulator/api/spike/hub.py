@@ -38,7 +38,7 @@ def repl_restart():
     pass
     
 def temperature():
-    return 0
+    return simulator_gui.get_temperature()
     
 def status():
     pass
@@ -70,3 +70,21 @@ def reset():
     
 def powerdown_timeout():
     pass
+    
+class Motion():
+    def yaw_pitch_roll(self):
+        return simulator_gui.get_yaw_pitch_roll()
+        
+    def accelerometer(self):
+    	pass
+    	
+    def gyroscope(self):
+    	pass
+    	
+    def orientation(self):
+    	pass
+    	
+    def gesture(self):
+    	pass
+        
+motion = Motion()

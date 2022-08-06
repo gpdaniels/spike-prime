@@ -11,7 +11,8 @@ motion.gyroscope()
 #motion.position() <-- Sadly doesn't exist
 
 # Get the euler angles of the hub.
-motion.yaw_pitch_roll()  
+yaw, pitch, roll = motion.yaw_pitch_roll()
+print(f"Yaw: {yaw}, Pitch: {pitch}, Roll: {roll}")
 
 # Get current orientation.
 #   1 - Front

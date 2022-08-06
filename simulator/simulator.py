@@ -68,7 +68,7 @@ class MotorLargeWidget(object):
         self.background_image = tkinter.PhotoImage(file = "./images/motor-large.png")
         self.canvas.create_image(150, 200, image=self.background_image)
         self.canvas.grid(column=0, row=0)
-        self.angle = tkinter.Scale(self.window, from_=-360, to=360, length=200, tickinterval=180, orient=tkinter.HORIZONTAL)
+        self.angle = tkinter.Scale(self.window, from_=0, to=360, length=200, tickinterval=180, orient=tkinter.HORIZONTAL)
         self.angle.grid(column=0, row=1)
         self.axle_image = tkinter.PhotoImage(file = "./tiles/motor-large-axle.png")
         self.axle_image_rotated = self.axle_image
@@ -186,7 +186,7 @@ class simulator_gui(metaclass=singleton):
         self.background_image = tkinter.PhotoImage(file = "./images/hub.png")
         self.background_label = tkinter.Label(self.hub_canvas, image=self.background_image)
         self.background_label.place(x=0, y=0)
-        self.hub_canvas.pack()
+        self.hub_canvas.grid(columnspan=2)
 
         print("Loading bluetooth button...")
         self.bluetooth_image = tkinter.PhotoImage(file = "./tiles/bluetooth.png")
@@ -309,6 +309,20 @@ class simulator_gui(metaclass=singleton):
         for port in ['A', 'B', 'C', 'D', 'E', 'F']:
             self.ports[port] = None
 
+        self.temperature_label = tkinter.Label(self.window, text='Temperature')
+        self.temperature_label.grid(column=0, row=1)
+        self.temperature = tkinter.Scale(self.window, from_=-20, to=50, length=200, tickinterval=10, orient=tkinter.HORIZONTAL)
+        self.temperature.grid(column=1, row=1)
+
+        self.orientation = list()
+        for index, orientation_limit in enumerate((("Yaw", 180), ("Pitch", 90), ("Roll", 180))):
+            orientation, limit = orientation_limit
+            label = tkinter.Label(self.window, text=f"{orientation} Angle")
+            angle = tkinter.Scale(self.window, from_=-limit, to=limit, length=200,  tickinterval=limit/2, orient=tkinter.HORIZONTAL)
+            self.orientation.append(angle)
+            label.grid(column=0, row=2 + index)
+            angle.grid(column=1, row=2 + index)
+                                    
         self.setup = True
 
         print("Setup done.")
@@ -447,8 +461,6 @@ class simulator_gui(metaclass=singleton):
         self.loaded_modules = dict()
         self.battery_charging = True
         self.battery_level = 1.0
-        self.temperature = 0.0
-        self.orientation = (0.0, 0.0, 0.0)
         self.accerometer = (0.0, 0.0, 0.0)
         self.gyroscope = (0.0, 0.0, 0.0)
         self.bluetooth_on_press = [lambda: print("bt down")]
@@ -555,10 +567,10 @@ class simulator_gui(metaclass=singleton):
                 self.lights[x][y].update()
 
     def get_temperature(self):
-        return self.temperature
+        return self.temperature.get()
 
-    def set_temperature(self, temperature):
-        self.temperature = temperature
+    def get_yaw_pitch_roll(self):
+        return [angle.get() for angle in self.orientation]
 
     # Function to wrap raw samples with a wav header, returned as a byte array.
     def samples_to_wav(self, bytes_per_sample, number_of_channels, sample_rate, samples):
