@@ -55,6 +55,7 @@ class singleton(type):
 # Widget to visualise a large lego motor.
 class MotorLargeWidget(object):
     def __init__(self, port):
+        self.reference = "MotorLargeWidget"  # Each widget needs this reference to allow hub to match to control functions
         self.window = tkinter.Toplevel()
         self.window.title(f"Large Motor : {port}")
         self.window.resizable(False, False)
