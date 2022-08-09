@@ -1,5 +1,5 @@
-
 import simulator_gui
+
 
 # 'hub': {
 #   'display': 'Display',
@@ -36,12 +36,15 @@ import simulator_gui
 
 def repl_restart():
     pass
-    
+
+
 def temperature():
     return simulator_gui.get_temperature()
-    
+
+
 def status():
     pass
+
 
 def led(*arguments):
     if (len(arguments) == 0):
@@ -64,27 +67,118 @@ def led(*arguments):
     if (len(arguments) == 3):
         # Set from RGB
         simulator_gui.set_led(arguments[0], arguments[1], arguments[2])
-    
+
+
 def reset():
     pass
-    
+
+
 def powerdown_timeout():
     pass
-    
+
+
 class Motion():
     def yaw_pitch_roll(self):
         return simulator_gui.get_yaw_pitch_roll()
-        
+
     def accelerometer(self):
-    	pass
-    	
+        pass
+
     def gyroscope(self):
-    	pass
-    	
+        pass
+
     def orientation(self):
-    	pass
-    	
+        pass
+
     def gesture(self):
-    	pass
-        
+        pass
+
+
 motion = Motion()
+
+
+class Motor():
+    def __init__(self, ):
+        self.velocity = 0
+
+    def default(self):
+        pass
+
+    def mode(self, state):
+        pass
+
+    def pid(self):
+        pass
+
+    def get(self):
+        pass
+
+    def pwm(self, pwm):
+        pass  # self.velocity = pwm
+
+    def preset(self, preset):
+        pass
+
+    def brake(self):
+        pass
+
+    def float(self):
+        pass
+
+    def hold(self):
+        pass
+
+    def run_at_speed(self, speed, max_power, acceleration, deceleration, stall):
+        pass
+
+    def run_for_degrees(self, degrees, speed):
+        pass
+
+    def run_to_position(self, degrees, speed):
+        simulator_gui.ports["A"].angle.set(degrees)
+        pass
+
+    def run_for_time(self, time, speed):
+        pass
+
+    def busy(self, param):  # param might be time
+        pass
+
+    def callback(self, param):  # param not sure
+        pass
+
+
+# Class for holding the Port reference 'A', 'B', etc
+class PortRef():
+    pass
+
+
+# dictionary of widgets to their name and class
+WIDGET_LOOKUP = {None: ['motor', None],
+                 "MotorLargeWidget": ['motor', Motor()],
+                 "MotorSmallWidget": ['motor', Motor()],
+                 }
+
+
+# This class connects Widgets to their relevant functions using the WIDGET_LOOKUP
+class Port():
+    def __init__(self):
+        configured_ports = list()
+        for key, value in simulator_gui.ports.items():
+            # print("ITEM", key, value, )
+            if value:
+                configured_ports.append([key, value.reference])
+            else:
+                configured_ports.append([key, None])
+
+        for key, widget in configured_ports:
+            # print(f"{key=} {widget=}")
+            setattr(self, key, PortRef())  # Setting main PortRef 'A', 'B' etc
+            widget_name, widget_class = WIDGET_LOOKUP[widget]
+            widget = widget_class  # What we are setting to
+            name = f"{key}.{widget_name}"
+            parent, child = name.split('.')
+            setattr(getattr(self, parent), child, widget)  # Setting our sub attribute.
+
+
+port = Port()
