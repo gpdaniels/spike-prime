@@ -97,6 +97,7 @@ class Motion():
 motion = Motion()
 
 
+
 class Motor():
     def __init__(self, ):
         self.velocity = 0
@@ -147,38 +148,17 @@ class Motor():
     def callback(self, param):  # param not sure
         pass
 
-
-# Class for holding the Port reference 'A', 'B', etc
-class PortRef():
-    pass
-
-
-# dictionary of widgets to their name and class
-WIDGET_LOOKUP = {None: ['motor', None],
-                 "MotorLargeWidget": ['motor', Motor()],
-                 "MotorSmallWidget": ['motor', Motor()],
-                 }
-
-
-# This class connects Widgets to their relevant functions using the WIDGET_LOOKUP
+# This class connects simulation Widgets to their relevant accessories
 class Port():
     def __init__(self):
-        configured_ports = list()
-        for key, value in simulator_gui.ports.items():
-            # print("ITEM", key, value, )
-            if value:
-                configured_ports.append([key, value.reference])
-            else:
-                configured_ports.append([key, None])
-
-        for key, widget in configured_ports:
-            # print(f"{key=} {widget=}")
-            setattr(self, key, PortRef())  # Setting main PortRef 'A', 'B' etc
-            widget_name, widget_class = WIDGET_LOOKUP[widget]
-            widget = widget_class  # What we are setting to
+        accessories = (None, Motor())
+        configured_ports = simulator_gui.create_ports_on_hub(accessories)
+        for key, widget_name, portref, instance in configured_ports:
+            setattr(self, key, portref)  # Setting main PortRef 'A', 'B' etc
             name = f"{key}.{widget_name}"
             parent, child = name.split('.')
-            setattr(getattr(self, parent), child, widget)  # Setting our sub attribute.
+            setattr(getattr(self, parent), child, instance)  # Setting our sub attribute.
 
 
 port = Port()
+#print(dir(port))
