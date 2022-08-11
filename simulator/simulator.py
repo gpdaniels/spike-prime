@@ -105,6 +105,24 @@ class MotorLargeWidget(object):
         self.canvas_axle_image = self.canvas.create_image(150, 336, image=self.axle_image_rotated)
 
 
+
+
+# Class for holding the Port reference 'A', 'B', etc
+class PortRef():
+    pass
+
+# Define some index names to make clear
+# The order has to match the accessories in the hub.py
+UNUSED, MOTOR = range(2)
+# dictionary of widgets to their name and their accessory hub class
+WIDGET_LOOKUP = {None: ['motor', UNUSED],
+                 "MotorLargeWidget": ['motor', MOTOR],
+                 "MotorSmallWidget": ['motor', MOTOR],
+                 }
+
+
+
+
 # The core of the simulator, provides access to the simulated hardware and runs the graphical user interface.
 class simulator_gui(metaclass=singleton):
     # Constructor creates the gui.
@@ -323,10 +341,22 @@ class simulator_gui(metaclass=singleton):
             self.orientation.append(angle)
             label.grid(column=0, row=2 + index)
             angle.grid(column=1, row=2 + index)
-                                    
+
         self.setup = True
 
         print("Setup done.")
+
+    def create_ports_on_hub(self, accessories,):
+        # create ports for the hub
+        configured_ports = list()
+        for key, value in self.ports.items():
+            if value:
+                widget_name, accessory_index = WIDGET_LOOKUP[value.reference]
+            else:
+                widget_name, accessory_index = WIDGET_LOOKUP[value]
+            accessory = accessories[accessory_index]
+            configured_ports.append([key, widget_name, PortRef(), accessory ]) # key, name, instance
+        return configured_ports
 
     def rgb_to_hex(self, red, green, blue):
         return "#%02x%02x%02x" % (red, green, blue)
