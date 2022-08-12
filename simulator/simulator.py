@@ -322,7 +322,7 @@ class simulator_gui(metaclass=singleton):
             self.orientation.append(angle)
             label.grid(column=0, row=2 + index)
             angle.grid(column=1, row=2 + index)
-                                    
+
         self.setup = True
 
         print("Setup done.")

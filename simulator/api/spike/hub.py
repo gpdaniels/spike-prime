@@ -1,4 +1,3 @@
-
 import simulator_gui
 
 # 'hub': {
@@ -36,12 +35,15 @@ import simulator_gui
 
 def repl_restart():
     pass
-    
+
+
 def temperature():
     return simulator_gui.get_temperature()
-    
+
+
 def status():
     pass
+
 
 def led(*arguments):
     if (len(arguments) == 0):
@@ -64,27 +66,31 @@ def led(*arguments):
     if (len(arguments) == 3):
         # Set from RGB
         simulator_gui.set_led(arguments[0], arguments[1], arguments[2])
-    
+
+
 def reset():
     pass
-    
+
+
 def powerdown_timeout():
     pass
-    
+
+
 class Motion():
     def yaw_pitch_roll(self):
         return simulator_gui.get_yaw_pitch_roll()
-        
+
     def accelerometer(self):
-    	pass
-    	
+        pass
+
     def gyroscope(self):
-    	pass
-    	
+        pass
+
     def orientation(self):
-    	pass
-    	
+        pass
+
     def gesture(self):
-    	pass
-        
+        pass
+
+
 motion = Motion()
