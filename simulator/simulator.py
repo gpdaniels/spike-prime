@@ -135,14 +135,14 @@ class PortRef:
 # Define some index names to make clear
 # The order has to match the accessories in the hub.py
 UNUSED, MOTOR = range(2)
-# dictionary of widgets to their name and their accessory hub class
-#  accessory_key_name,  hub_function_name,  hub_index
-WIDGET_LOOKUP = {None: ['motor', UNUSED],
+# dictionary of accessory to their name and their accessory hub class
+# accessory_key_name,  hub_function_name,  hub_index
+HUB_LOOKUP = {None: ['motor', UNUSED],
                  "MotorLarge": ['motor', MOTOR],
                  "MotorMedium": ['motor', MOTOR],
                  }
 
-# List of accessories
+# Dictionary of accessories to their widget
 ACCESSORY_LOOKUP = {None: None,
                     "None": None,
                     "MotorLarge": MotorLargeWidget,
@@ -396,9 +396,9 @@ class simulator_gui(metaclass=singleton):
         configured_ports = list()
         for key, value in self.ports.items():
             if value:
-                widget_name, accessory_index = WIDGET_LOOKUP[value.reference]
+                widget_name, accessory_index = HUB_LOOKUP[value.reference]
             else:
-                widget_name, accessory_index = WIDGET_LOOKUP[value]
+                widget_name, accessory_index = HUB_LOOKUP[value]
             accessory = accessories[accessory_index]
             configured_ports.append([key, widget_name, PortRef(), accessory])  # key, name, instance
         return configured_ports
