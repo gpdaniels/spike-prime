@@ -136,7 +136,7 @@ class Motor():
         pass
 
     def run_to_position(self, degrees, speed):
-        simulator_gui.ports["A"].angle.set(degrees)
+        simulator_gui.ports[self.my_port].angle.set(degrees)
         pass
 
     def run_for_time(self, time, speed):
@@ -157,8 +157,12 @@ class Port():
             setattr(self, key, portref)  # Setting main PortRef 'A', 'B' etc
             name = f"{key}.{widget_name}"
             parent, child = name.split('.')
-            setattr(getattr(self, parent), child, instance)  # Setting our sub attribute.
 
+            port_attr = getattr(self, parent)
+            setattr(port_attr, child, instance)  # Setting our sub attribute.
+            child_attr = getattr(port_attr, child)
+            if child_attr:
+                setattr(child_attr, 'my_port', key)
 
 port = Port()
 #print(dir(port))
