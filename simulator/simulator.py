@@ -54,7 +54,7 @@ class singleton(type):
             return self.__instance
 
 
-# Widget to visualise a large lego motor.
+# Widget to visualise a lego motor.
 class Motor_Base(object):
     def __init__(self, port, background_file="./images/motor-medium.png"):
         self.window = tkinter.Toplevel()
@@ -110,20 +110,20 @@ class Motor_Base(object):
         self.axle_image_rotated = self.rotate_photo_image(self.axle_image, self.axle_image_current_angle)
         self.canvas_axle_image = self.canvas.create_image(150, 336, image=self.axle_image_rotated)
 
-
+# Widget to visualise a large lego motor.
 class MotorLargeWidget(Motor_Base):
     def __init__(self, port, ow=None):
         super().__init__(port, "./images/motor-large.png")
         # Each widget needs a reference to allow hub to match to control functions
-        self.reference = "MotorLargeWidget"
+        self.reference = "MotorLarge"
         self.window.title(f"Large Motor : {port}")
 
-
+# Widget to visualise a medium lego motor.
 class MotorMediumWidget(Motor_Base):
     def __init__(self, port, ow=None):
         super().__init__(port, "./images/motor-medium.png")
         # Each widget needs a reference to allow hub to match to control functions
-        self.reference = "MotorMediumWidget"
+        self.reference = "MotorMedium"
         self.window.title(f"Medium Motor: {port}")
 
 
@@ -136,11 +136,18 @@ class PortRef:
 # The order has to match the accessories in the hub.py
 UNUSED, MOTOR = range(2)
 # dictionary of widgets to their name and their accessory hub class
+#  accessory_key_name,  hub_function_name,  hub_index
 WIDGET_LOOKUP = {None: ['motor', UNUSED],
-                 "MotorLargeWidget": ['motor', MOTOR],
-                 "MotorMediumWidget": ['motor', MOTOR],
+                 "MotorLarge": ['motor', MOTOR],
+                 "MotorMedium": ['motor', MOTOR],
                  }
 
+# List of accessories
+ACCESSORY_LOOKUP = {None: None,
+                    "None": None,
+                    "MotorLarge": MotorLargeWidget,
+                    "MotorMedium": MotorMediumWidget
+                    }
 
 # The core of the simulator, provides access to the simulated hardware and runs the graphical user interface.
 class simulator_gui(metaclass=singleton):
@@ -394,7 +401,7 @@ class simulator_gui(metaclass=singleton):
                 widget_name, accessory_index = WIDGET_LOOKUP[value]
             accessory = accessories[accessory_index]
             configured_ports.append([key, widget_name, PortRef(), accessory])  # key, name, instance
-        return configured_porload_scriptts
+        return configured_ports
 
     def rgb_to_hex(self, red, green, blue):
         return "#%02x%02x%02x" % (red, green, blue)
@@ -421,11 +428,11 @@ class simulator_gui(metaclass=singleton):
         while self.closing == False:
             self.window.update_idletasks()
             self.window.update()
-            for port, attachement in self.ports.items():
-                if attachement:
-                    attachement.window.update_idletasks()
-                    attachement.window.update()
-                    attachement.update()
+            for port, attachment in self.ports.items():
+                if attachment:
+                    attachment.window.update_idletasks()
+                    attachment.window.update()
+                    attachment.update()
             time.sleep(0.01)
 
         self.ready = False
@@ -433,8 +440,8 @@ class simulator_gui(metaclass=singleton):
         # Close the window
         print("Closing the GUI...")
 
-        for port, attachement in self.ports.items():
-            if attachement:
+        for port, attachment in self.ports.items():
+            if attachment:
                 self.ports[port].window.destroy()
                 self.ports[port] = None
 
@@ -543,15 +550,37 @@ class simulator_gui(metaclass=singleton):
         self.right_on_press = [lambda: print("right down")]
         self.right_on_release = [lambda: print("right up")]
 
+    def _popup_quit(self):
+        self.accessory_get = self.accessory.get(self.accessory.curselection())
+        self.pop_up_window.quit()
+        self.pop_up_window.destroy()
+
     def set_port_accessory(self, port):
         print(f"Configuring a port accessory on port {port}...")
         # TODO: Add/Remote a port accessory properly...
-        accessory = tkinter.Listbox()
+        self.pop_up_window = tkinter.Toplevel()
+        self.pop_up_window.geometry("300x250")
+        self.pop_up_window.title(f"Accessory {port}")
+        self.accessory = tkinter.Listbox(self.pop_up_window)
+        for _index, item in enumerate(ACCESSORY_LOOKUP):
+            self.accessory.insert(_index, item)
+        self.accessory.select_set(0)
+        self.accessory.grid()
+
+        exit_button = tkinter.Button(self.pop_up_window,
+                                     text="Select", command=self._popup_quit)
+        exit_button.grid()
+
+        self.pop_up_window.protocol("WM_DELETE_WINDOW", self._popup_quit)
+        self.pop_up_window.mainloop()
+
         if self.ports[port]:
             self.ports[port].window.destroy()
-            self.ports[port] = None
+
+        if ACCESSORY_LOOKUP[self.accessory_get]:
+            self.ports[port] = ACCESSORY_LOOKUP[self.accessory_get](port)
         else:
-            self.ports[port] = MotorLargeWidget(port)
+            self.ports[port] = None
 
     def add_bluetooth_callbacks(self, on_press, on_release):
         self.bluetooth_on_press.append(on_press)
