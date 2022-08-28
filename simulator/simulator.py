@@ -614,6 +614,8 @@ class simulator_gui(metaclass=singleton):
     def set_port_accessory(self, port):
         print(f"Configuring a port accessory on port {port}...")
         # TODO: Add/Remote a port accessory properly...
+        if hasattr(self, "pop_up_window"):
+            self._popup_quit()
         self.pop_up_window = tkinter.Toplevel()
         self.pop_up_window.geometry("300x250")
         self.pop_up_window.title(f"Accessory {port}")
