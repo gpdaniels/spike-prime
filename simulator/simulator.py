@@ -129,20 +129,24 @@ class Motor_Base(object):
                 ret = (target, True)
         return ret
 
-    def widget_run(self, target_degrees, speed):
+    def widget_run(self, target_degrees, speed, timeout=100, use_target=True):
         new_degrees = self.angle.get()
         step_degrees = self.maxspeed / 100 * self.validate_speed(speed)
-        running = True
-        while running:
+        start_time = time.time()
+        end_time = start_time + timeout
+        self.running = True
+        while self.running:
             reached_target = self.reached_target(target_degrees, new_degrees, step_degrees)
-            if reached_target:
-                running = False
+            if reached_target and use_target:
+                self.running = False
                 new_degrees, _truth = reached_target
             self.angle.set(new_degrees % 360)
             self.update()
             self.window.update()
             #       print(new_degrees)
             new_degrees += step_degrees
+            if time.time() >= end_time:
+                self.running = False
 
     def widget_run_for_degrees(self, degrees, speed):
         target_degrees = self.angle.get() + degrees
@@ -158,6 +162,9 @@ class Motor_Base(object):
                 speed = -speed
         self.widget_run(degrees, speed)
 
+    def widget_run_for_time(self, time_ms, speed):
+        print(time_ms, speed)
+        self.widget_run(0, speed, time_ms / 1000, False)
 
 # Widget to visualise a large lego motor.
 class MotorLargeWidget(Motor_Base):

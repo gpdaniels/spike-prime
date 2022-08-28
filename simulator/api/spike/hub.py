@@ -143,10 +143,12 @@ class Motor():
 
 
     def run_for_time(self, time, speed):
-        pass
+        simulator_gui.ports[self.my_port].widget_run_for_time(time, speed)
 
     def busy(self, param):  # param might be time
-        pass
+        ret = simulator_gui.ports[self.my_port].running
+        print(f"busy {ret=}")
+        return ret
 
     def callback(self, param):  # param not sure
         pass
