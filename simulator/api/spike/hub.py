@@ -133,12 +133,14 @@ class Motor():
         pass
 
     def run_for_degrees(self, degrees, speed):
-        pass
+        simulator_gui.ports[self.my_port].widget_run_for_degrees(degrees, speed)
+
 
     def run_to_position(self, degrees, speed):
-        print(f"{self.my_port=}")
-        simulator_gui.ports[self.my_port].angle.set(degrees)
-        pass
+        # print(f"{self.my_port=}")
+        # simulator_gui.ports[self.my_port].angle.set(degrees)
+        simulator_gui.ports[self.my_port].widget_run_to_position(degrees, speed)
+
 
     def run_for_time(self, time, speed):
         pass

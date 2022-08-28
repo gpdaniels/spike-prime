@@ -57,6 +57,7 @@ class singleton(type):
 # Widget to visualise a lego motor.
 class Motor_Base(object):
     def __init__(self, port, background_file="./images/motor-medium.png"):
+        self.maxspeed = 50  # 100% in degrees
         self.window = tkinter.Toplevel()
         self.background_file = background_file
 
@@ -109,6 +110,54 @@ class Motor_Base(object):
         self.axle_image_current_angle = self.angle.get()
         self.axle_image_rotated = self.rotate_photo_image(self.axle_image, self.axle_image_current_angle)
         self.canvas_axle_image = self.canvas.create_image(150, 336, image=self.axle_image_rotated)
+
+    def validate_speed(self, speed):
+        ret = speed
+        if speed < -100:
+            ret = -100
+        if speed > 100:
+            ret = 100
+        return ret
+
+    def reached_target(self, target, current, direction):
+        ret = False
+        if direction > 0:
+            if current >= target:
+                ret = (target, True)
+        else:
+            if current <= target:
+                ret = (target, True)
+        return ret
+
+    def widget_run(self, target_degrees, speed):
+        new_degrees = self.angle.get()
+        step_degrees = self.maxspeed / 100 * self.validate_speed(speed)
+        running = True
+        while running:
+            reached_target = self.reached_target(target_degrees, new_degrees, step_degrees)
+            if reached_target:
+                running = False
+                new_degrees, _truth = reached_target
+            self.angle.set(new_degrees % 360)
+            self.update()
+            self.window.update()
+            #       print(new_degrees)
+            new_degrees += step_degrees
+
+    def widget_run_for_degrees(self, degrees, speed):
+        target_degrees = self.angle.get() + degrees
+        self.widget_run(target_degrees, speed)
+
+    def widget_run_to_position(self, degrees, speed):
+        new_degrees = self.angle.get()
+        if (new_degrees - degrees) < 0:
+            if speed < 0:
+                speed = -speed
+        else:
+            if speed > 0:
+                speed = -speed
+        self.widget_run(degrees, speed)
+
 
 # Widget to visualise a large lego motor.
 class MotorLargeWidget(Motor_Base):
