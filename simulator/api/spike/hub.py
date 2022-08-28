@@ -136,6 +136,7 @@ class Motor():
         pass
 
     def run_to_position(self, degrees, speed):
+        print(f"{self.my_port=}")
         simulator_gui.ports[self.my_port].angle.set(degrees)
         pass
 
@@ -153,7 +154,9 @@ class Port():
     def __init__(self):
         accessories = (None, Motor())
         configured_ports = simulator_gui.create_ports_on_hub(accessories)
-        for key, widget_name, portref, instance in configured_ports:
+        for key, widget_name, portref, my_class in configured_ports:
+            instance = my_class.__class__()
+            print(f"{key=}  {widget_name=}  {portref=}  {instance=}")
             setattr(self, key, portref)  # Setting main PortRef 'A', 'B' etc
             name = f"{key}.{widget_name}"
             parent, child = name.split('.')
@@ -161,6 +164,7 @@ class Port():
             port_attr = getattr(self, parent)
             setattr(port_attr, child, instance)  # Setting our sub attribute.
             child_attr = getattr(port_attr, child)
+            print(f"   {port_attr=}  {child_attr=}")
             if child_attr:
                 setattr(child_attr, 'my_port', key)
 
