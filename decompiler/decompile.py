@@ -2,11 +2,8 @@
 
 import argparse
 import os
-import importlib  
-import io
 import json
 import re
-import sys
 
 
 opcode2data = {
@@ -72,16 +69,17 @@ branches = [
     'btrue.pop',
     'bfalse.pop',
     'jmp.unwind',
-    #"with.setup",
-    #"except.setup",
-    #"finally.setup",
-    #"except.jump",
+    # "with.setup",
+    # "except.setup",
+    # "finally.setup",
+    # "except.jump",
     'for.iter'
 ]
 
+
 def evalopwithstack(shadow, i, x, stack, tablevel):
     e = shadow[i]
-    if (e is None):
+    if e is None:
         globals()['outg'].append(('    ' * tablevel) + '# Error: Unknown operation "' + ' '.join(x[i]) + '"')
         for index in range(len(stack)):
             globals()['outg'].append(('    ' * tablevel) + '# Error: Current stack [{}]: "{}"'.format(index, stack[index]))
@@ -97,7 +95,7 @@ def evalopwithstack(shadow, i, x, stack, tablevel):
     
     data = []
     for index in range(cnt):
-        if (len(stack)):
+        if len(stack):
             data.append(stack.pop())
         else:
             data.append('__pop')
@@ -119,7 +117,7 @@ def evalopwithstack(shadow, i, x, stack, tablevel):
         globals()['outg'].append(('    ' * (tablevel + 1)) + 'pass')
         return match.group(0)[5:-1]
         #######################################################################
-        decompile_text(globals()['grps'].get(match.group(0)[5:-1]), tablevel +1) # '__tfn_' + p
+        decompile_text(globals()['grps'].get(match.group(0)[5:-1]), tablevel + 1)  # '__tfn_' + p
         return match.group(0)[5:-1]
     out = re.sub(r'(\$fun\([^\)]+\))', stage2_lbd, out)
     
@@ -127,7 +125,7 @@ def evalopwithstack(shadow, i, x, stack, tablevel):
     def stage3_lbd(match):
         [ident, nm] = match.group(0)[5:-1].split(',')
         globals()['outg'].append(('    ' * tablevel) + 'def ' + nm + '(*args):')
-        decompile_text(globals()['grps'].get(nm), tablevel + 1) # '__tfn_' + p
+        decompile_text(globals()['grps'].get(nm), tablevel + 1)  # '__tfn_' + p
         return '$nop'
     out = re.sub(r'(\$fst\([^,]+,[^\)]+\))', stage3_lbd, out)
     
@@ -141,7 +139,7 @@ def evalopwithstack(shadow, i, x, stack, tablevel):
         #######################################################################
         new_stk = []
         li = q
-        while (x[li][0] != 'btrue'):
+        while x[li][0] != 'btrue':
             xu = evalopwithstack(shadow, li, x, new_stk, 10)
             new_stk = xu[0]
             li += 1
@@ -155,28 +153,28 @@ def evalopwithstack(shadow, i, x, stack, tablevel):
     
     ############################################################################
     
-    if (out == '$nop'):
+    if out == '$nop':
         return [stack, tablevel]
     
     tableveln = tablevel
     
-    if (out.endswith('{')):
+    if out.endswith('{'):
         tableveln += 1
         out = out[0:-1].strip() + ':'
     
-    if (out.startswith('}')):
+    if out.startswith('}'):
         tableveln -= 1
-        if (out != '}'):
+        if out != '}':
             tablevel -= 1
         out = out[1:].strip()
     
-    if (out.startswith('$push(') and out.endswith(')')):
+    if out.startswith('$push(') and out.endswith(')'):
         stack.append(out[6:-1])
-    elif (out.startswith('$psh2(') and out.endswith(')')):
+    elif out.startswith('$psh2(') and out.endswith(')'):
         stack.append(out[6:-1])
         stack.append(out[6:-1])
-    elif (out == '$dup'):
-        if (len(stack)):
+    elif out == '$dup':
+        if len(stack):
             x = stack.pop()
             stack.append(x)
             stack.append(x)
@@ -185,9 +183,9 @@ def evalopwithstack(shadow, i, x, stack, tablevel):
             globals()['outg'].append(('    ' * tablevel) + '# Error: Cannot duplicate stack element from empty stack.')
             globals()['outg'].append(('    ' * tablevel) + 'pass')
         #######################################################################
-    elif (out == '}'):
+    elif out == '}':
         globals()['outg'].append(('    ' * tablevel) + stack.pop())
-    elif (out == '#'):
+    elif out == '#':
         pass
     else:
         globals()['outg'].append(('    ' * tablevel) + out)
@@ -196,11 +194,12 @@ def evalopwithstack(shadow, i, x, stack, tablevel):
 
     return [stack, tablevel]
 
-def decompile_text(text, tlba = 0):
+
+def decompile_text(text, tlba=0):
     map_z = {}
     
     def x2_lbd(e, i):
-        if (e.startswith('\t')):
+        if e.startswith('\t'):
             return e.strip().split(' ', 1)
         else: 
             map_z[e[0:-1]] = str(int(i) + 1)
@@ -218,14 +217,14 @@ def decompile_text(text, tlba = 0):
     regex = re.compile(r'(\$[0-9])')
     for opidx in range(len(x)):
         op = x[opidx]
-        if (op[0] in opcode2data):
+        if op[0] in opcode2data:
             decompilerShadow[opidx] = regex.sub(lambda match: op[int(match.group(0)[1:])], opcode2data.get(op[0]))
 
     # Strings.
     for opidx in range(len(x)):
         op = x[opidx]
-        if (op[0] == 'str'):
-            if (len(op) == 1):
+        if op[0] == 'str':
+            if len(op) == 1:
                 decompilerShadow[opidx] = '$push()'
             else:
                 decompilerShadow[opidx] = '$push(' + json.dumps(op[1], separators=(',', ':')) + ')'
@@ -236,7 +235,7 @@ def decompile_text(text, tlba = 0):
         break
         #######################################################################
         op = x[opidx]
-        if (op[0] == 'except.setup'):
+        if op[0] == 'except.setup':
             current = int(op[1])
             decompilerShadow[opidx] = 'try {'
             decompilerShadow[opidx + current - 2] = '$push(__except)'
@@ -249,34 +248,34 @@ def decompile_text(text, tlba = 0):
                     decompilerShadow[opidx + offset + i] = '$nop'
                 decompilerShadow[opidx + offset + 5] = '$psh2(__except)'
                 current = int(x[opidx + current + 3][1])
-                if (current == end_ptr):
+                if current == end_ptr:
                     break
             decompilerShadow[opidx + end_ptr - 3] = '}'
 
     # Imports
     for opidx in range(len(x)):
         op = x[opidx]
-        if (op[0] == 'import.nm'):
+        if op[0] == 'import.nm':
             nxop = x[opidx + 1]
             my_name = op[1]
-            if (nxop[0] == 'st.name'):
+            if nxop[0] == 'st.name':
                 used_name = nxop[1]
-                if (used_name != my_name):
+                if used_name != my_name:
                     decompilerShadow[opidx] = 'import ' + my_name + ' as ' + used_name + ' $ign($pop(1))'
                 else:
                     decompilerShadow[opidx] = 'import ' + my_name + ' $ign($pop(1))'
                 decompilerShadow[opidx + 1] = '$nop'
-            if (nxop[0] == 'import.all'):
+            if nxop[0] == 'import.all':
                 decompilerShadow[opidx] = 'from ' + my_name + ' import * $ign($pop(1))'
                 decompilerShadow[opidx + 1] = '$nop'
-            if (nxop[0] == 'import.from'):
+            if nxop[0] == 'import.from':
                 # We need to iterate, that's the only way.
                 nxop_map = []
                 i = opidx + 1
-                while (x[i][0] != 'pop'):
+                while x[i][0] != 'pop':
                     mine = x[i][1]
                     theirs = x[i + 1][1]
-                    if (mine == theirs):
+                    if mine == theirs:
                         nxop_map.append(mine)
                     else:
                         nxop_map.append(mine + ' as ' + theirs)
@@ -289,24 +288,24 @@ def decompile_text(text, tlba = 0):
     # While loops.
     for opidx in range(len(x)):
         op = x[opidx]
-        if (op[0] == 'jmp'):
+        if op[0] == 'jmp':
             #######################################################################
             continue
             #######################################################################
             tgop = int(op[1])
             i = int(op[1])
-            while ((i < len(x)) and (not x[i - 1][0] in branches)):
-                if (x[i][0] == 'btrue'):
+            while (i < len(x)) and (not x[i - 1][0] in branches):
+                if x[i][0] == 'btrue':
                     tgop = i
                 i = i + 1
-            if ((x[tgop]) and (x[tgop][0] == 'btrue')):
+            if (x[tgop]) and (x[tgop][0] == 'btrue'):
                 decompilerShadow[opidx] = 'while $warp(' + op[1] + ') {'
                 decompilerShadow[tgop] = '}'
 
     # For loops.
     for opidx in range(len(x)):
         op = x[opidx]
-        if ((op[0] == 'ld.iterstack') and (x[opidx + 1][0] == 'nop') and (x[opidx + 2][0] == 'for.iter') and (x[opidx + 3][0] == 'st.name')):
+        if (op[0] == 'ld.iterstack') and (x[opidx + 1][0] == 'nop') and (x[opidx + 2][0] == 'for.iter') and (x[opidx + 3][0] == 'st.name'):
             decompilerShadow[opidx] = '$nop'
             decompilerShadow[opidx + 2] = '$nop'
             decompilerShadow[opidx + 3] = 'for ' + x[opidx + 3][1] + ' in $pop(0) {'
@@ -315,26 +314,26 @@ def decompile_text(text, tlba = 0):
     # Functions call.
     for opidx in range(len(x)):
         op = x[opidx]
-        if (op[0] == 'mkfun'):
+        if op[0] == 'mkfun':
             # Call: $push($pop(2)($pop(0), $pop(1)))
             decompilerShadow[opidx] = '$push($fun(' + op[1] + '))'
-        if (op[0] == 'mkfun.defargs'):
+        if op[0] == 'mkfun.defargs':
             # Call: $push($pop(2)($pop(0), $pop(1)))
             decompilerShadow[opidx] = '$push($fun(' + op[1] + ')$ign($pop(0))'
 
     # Function store.
     for opidx in range(len(x)):
         op = x[opidx]
-        if ((op[0] == 'mkfun') and (x[opidx + 1][0] == 'st.name')):
+        if (op[0] == 'mkfun') and (x[opidx + 1][0] == 'st.name'):
             decompilerShadow[opidx] = '$fst(' + op[1] + ',' + x[opidx + 1][1] + ')'
             decompilerShadow[opidx + 1] = '$nop'
 
     # If statements.
     for opidx in range(len(x)):
         op = x[opidx]
-        if ((op[0] == 'bfalse') and (int(op[1]) > opidx)):
+        if (op[0] == 'bfalse') and (int(op[1]) > opidx):
             # if case op[1] this is actually a pop right after the if case to pop off the argument to bfalse.
-            if (x[int(op[1]) - 2][0] == 'jmp'):
+            if x[int(op[1]) - 2][0] == 'jmp':
                 decompilerShadow[opidx] = 'if $pop(0) {'
                 decompilerShadow[int(op[1]) - 2] = '} else {'
                 decompilerShadow[int(x[int(op[1]) - 2][1]) - 1] = '}#'
@@ -348,7 +347,7 @@ def decompile_text(text, tlba = 0):
         break
         #######################################################################
         op = x[opidx]
-        if ((op[0] == 'call') or (op[0] == 'call.meth')):
+        if (op[0] == 'call') or (op[0] == 'call.meth'):
             # Call: $push($pop(2)($pop(0), $pop(1)))
             args = ['$pop(' + str(i) + ')' for i in range(int(op[1]))]
             args.reverse()
@@ -357,7 +356,7 @@ def decompile_text(text, tlba = 0):
 
     for opidx in range(len(x)):
         op = x[opidx]
-        if (op[0] == 'tuple'):
+        if op[0] == 'tuple':
             # Call: $push($pop(2)($pop(0), $pop(1)))
             args = ['$pop(' + str(i) + ')' for i in range(int(op[1]))]
             args.reverse()
@@ -368,7 +367,7 @@ def decompile_text(text, tlba = 0):
     # Lists.
     for opidx in range(len(x)):
         op = x[opidx]
-        if (op[0] == 'list'):
+        if op[0] == 'list':
             # Call: $push($pop(2)($pop(0), $pop(1)))
             args = ['$pop(' + str(i) + ')' for i in range(int(op[1]))]
             args.reverse()
@@ -382,7 +381,8 @@ def decompile_text(text, tlba = 0):
         stack = o[0]
         tablevel = o[1]
 
-if (__name__ == "__main__"):
+
+if __name__ == "__main__":
     print("Initialising decompiler...")
     
     print("Parsing arguments...")
@@ -392,15 +392,15 @@ if (__name__ == "__main__"):
     arguments = parser.parse_args()
     
     print("Checking script...")
-    if (os.path.isfile(arguments.script_path) != True):
+    if not os.path.isfile(arguments.script_path):
         raise FileNotFoundError("Failed to find the script file at the given path.")
     
-    if (os.access(arguments.script_path, os.R_OK) != True):
+    if not os.access(arguments.script_path, os.R_OK):
         raise PermissionError("Do not have permission to read the script file.")
     
-    if (arguments.output_path != ""):
+    if arguments.output_path != "":
         print("Checking output...")
-        if (os.path.isfile(arguments.output_path) != False):
+        if os.path.isfile(arguments.output_path):
             raise FileNotFoundError("Found an existing file at the output file path.")
     
     script_file = open(arguments.script_path, mode='r')
@@ -412,23 +412,23 @@ if (__name__ == "__main__"):
     globals()['ids'] = []
     
     cur = '_'
-    for l in script_contents.splitlines():
-        if (l.strip() == ''):
+    for line in script_contents.splitlines():
+        if line.strip() == '':
             continue
-        if ((not l.startswith('.')) and (l.endswith(':'))):
+        if (not line.startswith('.')) and (line.endswith(':')):
             # We are a function.
-            cur = l[0:-1]
+            cur = line[0:-1]
             globals()['grps'][cur] = ''
             globals()['ids'].append(cur)
         else:
-            if (cur in globals()['grps']):
-                globals()['grps'][cur] = globals()['grps'].get(cur) + '\n' + l
+            if cur in globals()['grps']:
+                globals()['grps'][cur] = globals()['grps'].get(cur) + '\n' + line
             else:
-                globals()['grps'][cur] = l
+                globals()['grps'][cur] = line
     
     decompile_text(globals()['grps'].get('<module>'), 0)
     
-    if (arguments.output_path != ""):
+    if arguments.output_path != "":
         print("Writing output...")
         output_file = open(arguments.output_path, 'w') 
         output_file.write('\n'.join(globals()['outg']))
