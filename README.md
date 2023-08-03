@@ -9,7 +9,7 @@
 
 This applies to both the SPIKE Prime and Mindstorms Robot Inventor large hubs.
 
-|                     Part | Description                                                                      |
+|                     Part | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
 |                  **CPU** | STM32F413 (Architecture: ARM Cortex M4, ROM: 1M, RAM: 320k, Clock: 100MHz).      |
 |     **Internal storage** | 32MB flash memory (IC: Winbond W25Q256JV).                                       |
@@ -26,7 +26,7 @@ This applies to both the SPIKE Prime and Mindstorms Robot Inventor large hubs.
 
 This applies to the SPIKE Essential small hub.
 
-|                     Part | Description                                                                      |
+|                     Part | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
 |                  **CPU** | ?                                                                                |
 |     **Internal storage** | ?                                                                                |
@@ -101,7 +101,7 @@ Short versions numbers are from the `version.py` files where available.
 
 #### SPIKE Prime ####
 
-|                     Dump | Description                                                                      |
+|                     Dump | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
 | **v0.5.01.0000-42a938e** | Initial filesystem (Purchased on: 28/05/2020) (Box Version: 29).                 |
 | **v1.0.00.0027-64837e9** | Additional filesystem in 1.0.0 on Windows (Extracted from app.asar).             |
@@ -122,14 +122,14 @@ Short versions numbers are from the `version.py` files where available.
 
 #### SPIKE Essential ####
 
-|                     Dump | Description                                                                      |
+|                     Dump | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
 | **v1.0.00.0070-51a2ff4** | Initial filesystem (Purchased on: 27/09/2021) (Box Version: 143).                |
 
 
 #### Mindstorms Robot Inventor ####
 
-|                     Dump | Description                                                                      |
+|                     Dump | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
 | **v0.5.01.0002-f75d82d** | Initial filesystem (Purchased on: 16/10/2020).                                   |
 | **v1.0.06.0034-b0c335b** | Updated filesystem using 4.0.4-dev.99999 on Windows (Updated on: 20/10/2020).    |
@@ -189,7 +189,7 @@ Short versions numbers are from the `version.py` files where available.
 
 #### SPIKE Prime ####
 
-|                     Dump | Description                                                                      |
+|                     Dump | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
 | **v0.5.01.0000-42a938e** | **MISSING** Initial firmware (Purchased on: 28/05/2020) (Box Version: 29).       |
 | **v1.0.00.0027-64837e9** | **MISSING** Additional firmware in 1.0.0 on Windows (Extracted from app.asar).   |
@@ -210,13 +210,13 @@ Short versions numbers are from the `version.py` files where available.
 
 #### SPIKE Essential ####
 
-|                     Dump | Description                                                                      |
+|                     Dump | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
 | **v1.0.00.0070-51a2ff4** | **MISSING** Initial firmware (Purchased on: 27/09/2021) (Box Version: 143).      |
 
 #### Mindstorms Robot Inventor ####
 
-|                     Dump | Description                                                                      |
+|                     Dump | Description                                                                      |
 |-------------------------:|:---------------------------------------------------------------------------------|
 | **v0.5.01.0002-f75d82d** | Initial firmware (Purchased on: 16/10/2020).                                     |
 | **v1.0.06.0034-b0c335b** | Updated firmware using 4.0.4-dev.99999 on Windows (Updated on: 20/10/2020).      |
