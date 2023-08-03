@@ -1,0 +1,22 @@
+>>> import hub
+>>> help(hub)
+object <module 'hub'> is of type module
+  __name__ -- hub
+  bootloader -- <function>
+  temperature -- <function>
+  battery_voltage -- <function>
+  battery_temperature -- <function>
+  battery_current -- <function>
+  usb_charge_current -- <function>
+  hardware_id -- <function>
+  soft_reset -- <function>
+  reset -- <function>
+  power_off -- <function>
+  device_uuid -- <function>
+  config -- <config>
+  button -- <module 'button'>
+  light -- <module 'light'>
+  light_matrix -- <module 'light_matrix'>
+  motion_sensor -- <module 'motion_sensor'>
+  sound -- <module 'sound'>
+  port -- port(A=0, B=1, C=2, D=3, E=4, F=5)

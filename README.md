@@ -119,6 +119,9 @@ Short versions numbers are from the `version.py` files where available.
 | **v1.3.00.0000-e8c274a** | Updated filesystem using 2.0.3 / 2.0.4 on Windows (Updated on: 03/11/2021).      |
 | **v1.3.00.0000-e8c274a** | Updated filesystem using 2.0.5 on Windows (Updated on: 09/05/2022) [UNCHANGED].  |
 | **v1.3.00.0000-e8c274a** | Updated filesystem using 2.0.6 on Windows (Updated on: 09/05/2022) [UNCHANGED].  |
+| **v1.3.00.0000-e8c274a** | Updated filesystem using 2.0.7 on Windows (Updated on: ??/??/????) [UNCHANGED].  |
+| **v1.3.00.0000-e8c274a** | Updated filesystem using 2.0.8 on Windows (Updated on: ??/??/????) [UNCHANGED].  |
+| **vX.X.XX.XXXX-XXXXXXX** | Updated filesystem using 3.3.1 on Windows (Updated on: 03/08/2023).              |
 
 #### SPIKE Essential ####
 
@@ -207,6 +210,9 @@ Short versions numbers are from the `version.py` files where available.
 | **v1.3.00.0000-e8c274a** | Updated firmware using 2.0.3 / 2.0.4 on Windows (Updated on: 03/11/2021).        |
 | **v1.3.00.0000-e8c274a** | Updated firmware using 2.0.5 on Windows (Updated on: 09/05/2022) [UNCHANGED].    |
 | **v1.3.00.0000-e8c274a** | Updated firmware using 2.0.6 on Windows (Updated on: 09/05/2022) [UNCHANGED].    |
+| **v1.3.00.0000-e8c274a** | Updated firmware using 2.0.7 on Windows (Updated on: ??/??/????) [UNCHANGED].    |
+| **v1.3.00.0000-e8c274a** | Updated firmware using 2.0.8 on Windows (Updated on: ??/??/????) [UNCHANGED].    |
+| **vX.X.XX.XXXX-XXXXXXX** | Updated firmware using 3.3.1 on Windows (Updated on: 03/08/2023).                |
 
 #### SPIKE Essential ####
 

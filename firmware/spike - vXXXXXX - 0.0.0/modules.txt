@@ -1,0 +1,13 @@
+>>> help('modules')
+__main__          binascii          gc                platform
+_asyncio          bluetooth         hashlib           random
+_system/default   builtins          heapq             re
+_system/menu      cmath             hub               runloop
+_system/scratch   collections       io                select
+array             color             json              struct
+asyncio/__init__  color_matrix      math              sys
+asyncio/core      color_sensor      micropython       time
+asyncio/event     device            motor             uasyncio
+asyncio/funcs     distance_sensor   motor_pair        uctypes
+asyncio/lock      errno             orientation       zlib
+asyncio/stream    force_sensor      os
