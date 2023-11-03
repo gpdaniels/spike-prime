@@ -1,5 +1,6 @@
 import simulator_gui
 
+
 # 'hub': {
 #   'display': 'Display',
 #   'config': 'dict',
@@ -94,3 +95,82 @@ class Motion():
 
 
 motion = Motion()
+
+
+
+class Motor():
+    def __init__(self, ):
+        self.velocity = 0
+
+    def default(self):
+        pass
+
+    def mode(self, state):
+        pass
+
+    def pid(self):
+        pass
+
+    def get(self):
+        pass
+
+    def pwm(self, pwm):
+        pass  # self.velocity = pwm
+
+    def preset(self, preset):
+        pass
+
+    def brake(self):
+        pass
+
+    def float(self):
+        pass
+
+    def hold(self):
+        pass
+
+    def run_at_speed(self, speed, max_power, acceleration, deceleration, stall):
+        pass
+
+    def run_for_degrees(self, degrees, speed):
+        simulator_gui.ports[self.my_port].widget_run_for_degrees(degrees, speed)
+
+
+    def run_to_position(self, degrees, speed):
+        # print(f"{self.my_port=}")
+        # simulator_gui.ports[self.my_port].angle.set(degrees)
+        simulator_gui.ports[self.my_port].widget_run_to_position(degrees, speed)
+
+
+    def run_for_time(self, time, speed):
+        simulator_gui.ports[self.my_port].widget_run_for_time(time, speed)
+
+    def busy(self, param):  # param might be time
+        ret = simulator_gui.ports[self.my_port].running
+        print(f"busy {ret=}")
+        return ret
+
+    def callback(self, param):  # param not sure
+        pass
+
+# This class connects simulation Widgets to their relevant accessories
+class Port():
+    def __init__(self):
+        accessories = (None, Motor())
+        configured_ports = simulator_gui.create_ports_on_hub(accessories)
+        for key, widget_name, portref, my_class in configured_ports:
+            instance = type(my_class)()
+            # print(f"{key=}  {widget_name=}  {portref=}  {instance=}")
+            setattr(self, key, portref)  # Setting main PortRef 'A', 'B' etc
+            name = f"{key}.{widget_name}"
+            parent, child = name.split('.')
+
+            port_attr = getattr(self, parent)
+            setattr(port_attr, child, instance)  # Setting our sub attribute.
+            child_attr = getattr(port_attr, child)
+            # print(f"   {port_attr=}  {child_attr=}")
+            if child_attr:
+                setattr(child_attr, 'my_port', key)
+
+port = Port()
+#print(dir(port))
